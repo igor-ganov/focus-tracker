@@ -1,0 +1,23 @@
+{
+  "id": "./",
+  "name": "Focus Tracker",
+  "short_name": "Focus",
+  "description": "Offline-first focus timer and time log for a fragmented day",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#FBF7EE",
+  "background_color": "#FBF7EE",
+  "categories": ["productivity"],
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Pause timer", "short_name": "Pause", "url": "./?action=pause", "icons": [{ "src": "icons/shortcut-pause-96.png", "sizes": "96x96", "type": "image/png" }] },
+    { "name": "Add task", "short_name": "Add", "url": "./?action=add", "icons": [{ "src": "icons/shortcut-add-96.png", "sizes": "96x96", "type": "image/png" }] }
+  ]
+}
