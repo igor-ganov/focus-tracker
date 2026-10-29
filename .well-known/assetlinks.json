@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.igor_ganov.focustracker",
+      "sha256_cert_fingerprints": [
+        "E4:57:D0:40:E2:99:02:C8:49:76:B2:EA:FE:DC:66:75:86:E0:6C:25:E5:AA:32:9F:17:01:8B:E0:1E:43:90:4E"
+      ]
+    }
+  }
+]

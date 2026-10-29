@@ -665,41 +665,55 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
         ${nT(e,t,n.id,n.name)}
       </li>`)}
   </ul>
-`,iT=(e,t)=>L(e.addable.length>0,()=>B`
+`,iT=(e,t)=>B`
+  <form id="new-project" class="new-project sk card" @submit=${t.createProject}>
+    <label for="new-project-name" class="new-label">New project name</label>
+    <input id="new-project-name" class="inp sk" data-testid=${X.newProjectName} autocomplete="off" aria-describedby="new-project-hint"
+      .value=${e} @input=${t.nameInput} @keydown=${t.nameKey}>
+    <button type="submit" class="btn sk primary" data-testid=${X.createProject} aria-disabled=${String(e.trim().length===0)}>Create</button>
+    <p id="new-project-hint" class="muted hint">Enter creates · Esc cancels</p>
+  </form>`,aT=(e,t)=>B`
+  <button type="button" class="btn add" data-testid=${X.newProject} aria-expanded=${String(e.creating)} aria-controls="new-project"
+    @click=${t.toggleCreating}>+ New project</button>
+  ${L(e.creating,()=>iT(e.newName,t),()=>V)}
+`,oT=(e,t)=>L(e.addable.length>0,()=>B`
   <ul id="addable" class="addable" aria-label="Todoist projects to add">
     ${e.addable.map(e=>B`<li>
       <button type="button" class="btn pick" data-testid=${X.addable(e.id)} @click=${()=>{t.addProject(e.id)}}>+ ${e.name}</button>
     </li>`)}
-  </ul>`,()=>B`<p id="addable" class="muted hint">No more Todoist projects — connect Todoist in Settings to see yours.</p>`),aT=(e,t,n)=>B`
+  </ul>`,()=>B`<p id="addable" class="muted hint">No more Todoist projects — connect Todoist in Settings to see yours.</p>`),sT=(e,t,n)=>B`
   <button type="button" class="btn add" data-testid=${X.addProject} aria-expanded=${String(t)} aria-controls="addable"
     @click=${n.toggleAdding}>+ Add Todoist project</button>
-  ${L(t,()=>iT(e,n),()=>V)}
-`,oT=e=>E(e.preview).pipe(T({onNone:()=>V,onSome:e=>B`<span class="preview">“${e}”</span>`})),sT=(e,t)=>B`
+  ${L(t,()=>oT(e,n),()=>V)}
+`,cT=(e,t,n)=>B`
+  ${aT(t,n)}
+  ${L(t.todoist,()=>sT(e,t.adding,n),()=>V)}
+`,lT=e=>E(e.preview).pipe(T({onNone:()=>V,onSome:e=>B`<span class="preview">“${e}”</span>`})),uT=(e,t)=>B`
   <ol class="pages" aria-labelledby="pages-title">
     ${e.map(e=>B`<li>
       <button type="button" class="row" data-testid=${X.pageRow} aria-current=${L(e.current,()=>`page`,()=>`false`)}
         @click=${()=>{t.openPage(e.id)}}>
-        <span>${e.dateLabel}</span><span class="muted">${e.totalLabel} · ${e.doneLabel}</span>${oT(e)}
+        <span>${e.dateLabel}</span><span class="muted">${e.totalLabel} · ${e.doneLabel}</span>${lT(e)}
       </button>
     </li>`)}
-  </ol>`,cT=(e,t)=>B`
+  </ol>`,dT=(e,t)=>B`
   <h3 id="pages-title" class="head section">Pages · newest first</h3>
-  ${L(e.length>0,()=>sT(e,t),()=>B`<p class="muted hint">No pages in this project yet.</p>`)}
-`,lT=B`<svg width="22" height="22" viewBox="0 0 22 22" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
-  aria-hidden="true"><path d="M4 4.5c5 4 9 8.5 14 13M18 4c-4 5-9 9-14 14"></path></svg>`,uT=(e,t,n)=>B`
+  ${L(e.length>0,()=>uT(e,t),()=>B`<p class="muted hint">No pages in this project yet.</p>`)}
+`,fT=B`<svg width="22" height="22" viewBox="0 0 22 22" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+  aria-hidden="true"><path d="M4 4.5c5 4 9 8.5 14 13M18 4c-4 5-9 9-14 14"></path></svg>`,pT=(e,t,n)=>B`
   <dialog data-testid=${X.menu} aria-labelledby="menu-title" @click=${n.closeOnBackdrop}>
     <nav class="sk2" aria-label="Projects and pages">
       <header class="top">
         <h2 id="menu-title" class="head menu-title">Projects</h2>
-        <button type="button" class="ico" aria-label="Close menu" data-testid=${X.menuClose} @click=${n.close}>${lT}</button>
+        <button type="button" class="ico" aria-label="Close menu" data-testid=${X.menuClose} @click=${n.close}>${fT}</button>
       </header>
       ${rT(e,n)}
-      ${aT(e,t,n)}
-      ${cT(e.pages,n)}
+      ${cT(e,t,n)}
+      ${dT(e.pages,n)}
       <button type="button" class="btn sk settings" data-testid=${X.settings} @click=${n.openSettings}>Settings</button>
     </nav>
   </dialog>
-`,dT=e=>{e.renderRoot.querySelectorAll(`dialog`).forEach(e=>{e.close()})},fT=(e,t)=>({close:()=>{dT(e)},closeOnBackdrop:t=>{e.renderRoot.querySelectorAll(`dialog`).forEach(e=>{[t.target].filter(t=>t===e).forEach(()=>{e.close()})})},toggleAdding:()=>{e.adding=!e.adding},switchProject:e=>{t.store.dispatch({type:`pages/projectSwitched`,at:t.now(),projectId:e})},addProject:n=>{t.store.dispatch({type:`pages/projectAdded`,at:t.now(),projectId:n}),e.adding=!1},removeProject:e=>{t.store.dispatch({type:`pages/projectRemoved`,at:t.now(),projectId:e})},openPage:n=>{t.store.dispatch({type:`pages/opened`,at:t.now(),id:n}),dT(e)},openSettings:()=>{dT(e),globalThis.dispatchEvent(new CustomEvent(`tt:open-settings`))}}),pT=e=>{let t=()=>{e.adding=!1,e.renderRoot.querySelectorAll(`dialog`).forEach(e=>{e.showModal()})};return{connect:()=>{globalThis.addEventListener(`tt:open-menu`,t)},disconnect:()=>{globalThis.removeEventListener(`tt:open-menu`,t)}}},mT=z`
+`,mT=(e,t,n)=>O(j(e.trim(),e=>e.length>0),e=>({type:`catalog/projectCreated`,at:t,id:n,name:e})),hT=(e,t)=>{e.updateComplete.then(()=>{O(E(e.renderRoot.querySelector(`[data-testid="${t}"]`)),e=>{e.focus()})})},gT=e=>{e.creating=!1,e.newName=``},_T=(e,t)=>({toggleCreating:()=>{e.creating=!e.creating,e.newName=``,R(e.creating,()=>{hT(e,X.newProjectName)})},nameInput:t=>{O(j(t.currentTarget,e=>e instanceof HTMLInputElement),t=>{e.newName=t.value})},nameKey:t=>{R(t.key===`Escape`,()=>{t.preventDefault(),t.stopPropagation(),gT(e),hT(e,X.newProject)})},createProject:n=>{n.preventDefault(),O(mT(e.newName,t.now(),t.newId()),n=>{t.store.dispatch(n),gT(e),hT(e,X.newProject)})}}),vT=e=>{e.renderRoot.querySelectorAll(`dialog`).forEach(e=>{e.close()})},yT=(e,t)=>({..._T(e,t),close:()=>{vT(e)},closeOnBackdrop:t=>{e.renderRoot.querySelectorAll(`dialog`).forEach(e=>{[t.target].filter(t=>t===e).forEach(()=>{e.close()})})},toggleAdding:()=>{e.adding=!e.adding},switchProject:e=>{t.store.dispatch({type:`pages/projectSwitched`,at:t.now(),projectId:e})},addProject:n=>{t.store.dispatch({type:`pages/projectAdded`,at:t.now(),projectId:n}),e.adding=!1},removeProject:e=>{t.store.dispatch({type:`pages/projectRemoved`,at:t.now(),projectId:e})},openPage:n=>{t.store.dispatch({type:`pages/opened`,at:t.now(),id:n}),vT(e)},openSettings:()=>{vT(e),globalThis.dispatchEvent(new CustomEvent(`tt:open-settings`))}}),bT=e=>{let t=()=>{e.adding=!1,e.creating=!1,e.newName=``,e.renderRoot.querySelectorAll(`dialog`).forEach(e=>{e.showModal()})};return{connect:()=>{globalThis.addEventListener(`tt:open-menu`,t)},disconnect:()=>{globalThis.removeEventListener(`tt:open-menu`,t)}}},xT=z`
   dialog { margin: 0; inset: 0 auto 0 0; padding: 0; border: 0; background: transparent; color: inherit;
     width: min(370px, 92vw); max-width: none; height: 100dvh; max-height: none; }
   dialog::backdrop { background: color-mix(in srgb, var(--ink) 35%, transparent); }
@@ -714,6 +728,11 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
   .count { color: var(--ink-soft); font-size: 15px; }
   .remove { font-size: 24px; flex: none; }
   .add { border: 0; background: transparent; color: var(--break); align-self: flex-start; }
+  .new-project { border-style: dashed; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .new-label { font-size: 18px; }
+  .primary { background: var(--ink); color: var(--card); align-self: flex-start; }
+  .primary:hover { background: var(--ink-soft); }
+  .primary[aria-disabled='true'] { background: var(--ink-muted); opacity: 1; }
   .section { font-size: 26px; margin-top: 8px; }
   .row { width: 100%; box-sizing: border-box; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px;
     font: inherit; font-size: 18px; color: var(--ink); background: transparent; border: 0; border-bottom: 1.5px dashed var(--rule);
@@ -723,55 +742,55 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
   .preview { flex-basis: 100%; font-size: 15px; background: var(--st-yellow); padding: 2px 8px; justify-self: start; width: fit-content; }
   .hint { margin: 0; font-size: 16px; }
   .settings { margin-top: auto; align-self: flex-start; }
-`,hT=class extends H{static{this.properties={adding:{state:!0}}}static{this.styles=[U,mT]}constructor(){super(),this.link=W(this),this.ctl=pT(this),this.adding=!1}connectedCallback(){super.connectedCallback(),this.ctl.connect()}disconnectedCallback(){super.disconnectedCallback(),this.ctl.disconnect()}render(){return G(this.link)((e,t)=>uT(tT(e),this.adding,fT(this,t)))}};customElements.define(`tt-project-menu`,hT);var gT={open:!1,query:``,expanded:new Set,focusId:void 0,notice:``,form:void 0,editId:void 0},_T=(e,t)=>{e.ui={...e.ui,...t}},vT=(e,t)=>{e.updateComplete.then(()=>{e.renderRoot.querySelector(t)?.focus()})},yT=`#tt-picker-input`,Z={focusRow:(e,t)=>{_T(e,{focusId:t}),vT(e,`[data-row-id="${CSS.escape(t)}"]`)},setExpanded:(e,t,n)=>{_T(e,{expanded:new Set([...e.ui.expanded].filter(e=>e!==t).concat([t].filter(()=>n)))})},close:e=>{_T(e,{open:!1}),vT(e,yT)},openForm:(e,t)=>{_T(e,{form:t,open:!1})},openEdit:(e,t)=>{_T(e,{editId:t,open:!1})},focusInput:e=>{vT(e,yT)}},bT=e=>k(D(e.pages.currentPageId),t=>E(e.pages.byId[t])),xT=(e,t)=>[{status:`active`,hit:e?.active.some(e=>e.taskId===t)??!1},{status:`queued`,hit:e?.queue.includes(t)??!1}].find(e=>e.hit)?.status??`none`,ST=(e,t)=>n=>{let r=t.store.getState();T(bT(r),{onNone:()=>void 0,onSome:i=>{let a=r.catalog.tasks[n]?.content??n,o=xT(i,n)!==`none`;R(o,()=>{globalThis.dispatchEvent(new CustomEvent(`tt:highlight-task`,{detail:n}))}),R(!o,()=>{t.store.dispatch({type:`pages/taskActivated`,at:t.now(),pageId:i.id,taskId:n})}),_T(e,{open:!1,query:``,focusId:void 0,notice:L(o,()=>`“${a}” is already in focus`,()=>`“${a}” added to focus`)})}})},CT=e=>e.normalize(`NFD`).replace(/\p{Diacritic}/gu,``).toLowerCase(),wT={kind:`none`},TT=e=>e.find(e=>e.hit)?.command()??wT,ET=(e,t)=>T(D(e[t]),{onNone:()=>wT,onSome:e=>({kind:`focus`,id:e.id})}),DT=e=>(t,n)=>{let r=t[n];return TT([{hit:r?.kind===`task`,command:()=>({kind:e,id:r?.id??``})}])},OT=(e,t)=>{let n=e[t],r=n?.kind===`section`||n?.kind===`task`&&n.expanded,i=(e[t+1]?.level??0)>(n?.level??0);return TT([{hit:n?.kind===`task`&&n.expandable&&!n.expanded,command:()=>({kind:`expand`,id:n?.id??``})},{hit:r&&i,command:()=>ET(e,t+1)}])},kT=(e,t)=>{let n=e[t],r=e.slice(0,t).findLastIndex(e=>e.level===(n?.level??0)-1);return TT([{hit:n?.kind===`task`&&n.expanded,command:()=>({kind:`collapse`,id:n?.id??``})},{hit:r>=0,command:()=>ET(e,r)}])},AT=e=>(t,n)=>{let r=CT(e);return ET(t,t.map((e,r)=>(n+1+r)%t.length).find(e=>CT(t[e]?.title??``).startsWith(r))??-1)},jT=new Map([[`ArrowDown`,(e,t)=>ET(e,Math.min(t+1,e.length-1))],[`ArrowUp`,(e,t)=>ET(e,Math.max(t-1,0))],[`Home`,e=>ET(e,0)],[`End`,e=>ET(e,e.length-1)],[`ArrowRight`,OT],[`ArrowLeft`,kT],[`Enter`,DT(`pick`)],[`F2`,DT(`edit`)],[`+`,DT(`subtask`)],[`Escape`,()=>({kind:`close`})]]),MT=e=>jT.get(e)??L(/^\S$/u.test(e),()=>AT(e),()=>()=>wT),NT=(e,t,n)=>MT(n)(e,Math.max(0,e.findIndex(e=>e.id===t))),PT=e=>(t,n)=>e(t)-e(n)||t.id.localeCompare(n.id),FT=e=>t=>t.toSorted(PT(e=>e.childOrder)).map(t=>{let n=FT(e)(e.filter(e=>e.parentId===t.id));return{task:t,children:n,subtasks:n.length}}),IT=(e,t)=>{let n=Object.values(e.tasks).filter(e=>e.projectId===t&&!e.checked),r=new Set(n.map(e=>e.id)),i=n.filter(e=>e.parentId===void 0||!r.has(e.parentId)),a=Object.values(e.sections).filter(e=>e.projectId===t).toSorted(PT(e=>e.sectionOrder)),o=new Set(a.map(e=>e.id)),s=FT(n);return[{section:void 0,variant:`section`,nodes:s(i.filter(e=>e.sectionId===void 0||!o.has(e.sectionId)))},...a.map(e=>({section:e,variant:`section`,nodes:s(i.filter(t=>t.sectionId===e.id))}))]},LT=e=>t=>t.flatMap(t=>{let n=LT(e)(t.children);return[{...t,children:n}].filter(()=>n.length>0||CT(t.task.content).includes(e))}),RT=e=>t=>{let n=CT(e.trim());return L(n.length===0,()=>t,()=>t.map(e=>({...e,nodes:LT(n)(e.nodes)})).filter(e=>e.nodes.length>0))},zT=e=>(t,n,r)=>t.flatMap((t,i)=>{let a=t.children.length>0,o=a&&e(t.task.id),s=t.children.filter(()=>o);return[{kind:`task`,id:t.task.id,title:t.task.content,task:t.task,level:n,setsize:r,posinset:i+1,expandable:a,expanded:o,subtasks:t.subtasks},...zT(e)(s,n+1,s.length)]}),BT=(e,t)=>{let n=zT(t),r=e.find(e=>e.section===void 0)?.nodes??[],i=e.flatMap(e=>Yn(D(e.section)).map(t=>({section:t,variant:e.variant,nodes:e.nodes}))),a=r.length+i.length;return[...n(r,1,a),...i.flatMap(({section:e,variant:t,nodes:i},o)=>[{kind:`section`,variant:t,id:`section:${e.id}`,title:e.name,level:1,setsize:a,posinset:r.length+o+1},...n(i,2,i.length)])]},VT=(e,t,n)=>{let r=[...new Set([Om,...Yn(D(e.sync.inboxProjectId))])].filter(e=>e!==t).flatMap(t=>RT(n)(IT(e.catalog,t)).flatMap(e=>e.nodes));return[{section:{id:Om,projectId:Om,name:`Inbox · ${String(r.length)}`,sectionOrder:0},variant:`inbox`,nodes:r}].filter(e=>e.nodes.length>0)},HT=e=>Object.values(e).reduce((e,t)=>new Map(e).set(t.taskId,(e.get(t.taskId)??0)+t.minutes),new Map),UT=e=>{let t=Math.floor(e/60),n=e%60;return[...[`${String(t)}h`].filter(()=>t>0),...[`${String(n).padStart(1+Number(t>0),`0`)}m`].filter(()=>n>0)].join(` `)},WT=(e,t,n)=>[e.map(e=>`@${e}`).join(` `),...[`${String(t)} subtask${`s`.repeat(Number(t!==1))}`].filter(()=>t>0),UT(n)].filter(e=>e.length>0).join(` · `),GT=(e,t)=>n=>{switch(n.kind){case`section`:return n;case`task`:return{...n,meta:WT(n.task.labels,n.subtasks,t.get(n.id)??0),status:xT(e,n.id)}}},KT=(e,t,n)=>T(bT(e),{onNone:()=>[],onSome:r=>{let i=t.trim().length>0;return BT([...RT(t)(IT(e.catalog,r.projectId)),...VT(e,r.projectId,t)],e=>i||n.has(e)).map(GT(r,HT(e.log.entries)))}}),qT=(e,t,n)=>{switch(n.kind){case`focus`:Z.focusRow(e,n.id);break;case`expand`:Z.setExpanded(e,n.id,!0);break;case`collapse`:Z.setExpanded(e,n.id,!1);break;case`pick`:ST(e,t)(n.id),Z.focusInput(e);break;case`edit`:Z.openEdit(e,n.id);break;case`subtask`:Z.openForm(e,{title:``,parentId:n.id});break;case`close`:Z.close(e)}},JT=(e,t)=>n=>{let r=KT(t.store.getState(),e.ui.query,e.ui.expanded),i=L(n.ctrlKey||n.altKey||n.metaKey,()=>``,()=>n.key),a=NT(r,e.ui.focusId,i);R(a.kind!==`none`,()=>{n.preventDefault()}),qT(e,t,a)},YT=new Map([[`ArrowDown`,(e,t)=>{_T(e,{open:!0,notice:``}),O(D(KT(t.store.getState(),e.ui.query,e.ui.expanded)[0]),t=>{Z.focusRow(e,t.id)})}],[`Escape`,e=>{_T(e,{open:!1})}],[`Enter`,e=>{R(e.ui.query.trim().length>0,()=>{Z.openForm(e,{title:e.ui.query.trim(),parentId:void 0})})}]]),XT=(e,t)=>n=>{O(D(YT.get(n.key)),r=>{n.preventDefault(),r(e,t)})},ZT=e=>u(j(e.target,e=>e instanceof HTMLInputElement||e instanceof HTMLSelectElement),T({onNone:()=>``,onSome:e=>e.value})),QT=(e,t)=>!(t.relatedTarget instanceof Node&&e.renderRoot.contains(t.relatedTarget)),$T=(e,t)=>({query:t=>{_T(e,{query:ZT(t),open:!0,notice:``,focusId:void 0})},open:()=>{_T(e,{open:!0,notice:``})},inputKey:XT(e,t),treeKey:JT(e,t),focusOut:t=>{R(e.ui.open&&QT(e,t),()=>{_T(e,{open:!1})})},rowFocus:t=>{R(e.ui.focusId!==t,()=>{_T(e,{focusId:t})})},pick:ST(e,t),toggle:t=>{Z.setExpanded(e,t,!e.ui.expanded.has(t))},subtask:t=>{Z.openForm(e,{title:``,parentId:t})},edit:t=>{Z.openEdit(e,t)},create:()=>{Z.openForm(e,{title:e.ui.query.trim(),parentId:void 0})},formClosed:t=>{_T(e,{form:void 0,query:L(t,()=>``,()=>e.ui.query)}),Z.focusInput(e)},editClosed:()=>{_T(e,{editId:void 0}),Z.focusInput(e)}}),eE=e=>u(bT(e),k(t=>E(e.catalog.projects[t.projectId])),T({onNone:()=>`this project`,onSome:e=>e.name})),tE=e=>{let t=e.trim();return L(t.length>0,()=>`Create task “${t}” and start`,()=>`Create a task or subtask…`)},nE=(e,t,n,r)=>{let i=KT(e,t,n);return{enabled:Wn(bT(e)),project:eE(e),rows:i,rovingId:(i.find(e=>e.id===r)??i[0])?.id,prompt:tE(t),empty:L(t.trim().length>0,()=>`No tasks match “${t.trim()}”`,()=>`No open tasks in this project yet`)}},rE=e=>e??V,Q={input:`task-picker-input`,hint:`task-picker-hint`,notice:`task-picker-notice`,tree:`task-tree`,inboxHeading:`task-inbox-heading`,row:`task-row`,toggle:`task-toggle`,addSubtask:`task-add-subtask`,edit:`task-edit-open`,status:`task-status`,pending:`task-pending`,create:`task-create`,form:`task-form`,formTitle:`task-form-title`,formParent:`task-form-parent`,formSection:`task-form-section`,formFocus:`task-form-focus`,formSubmit:`task-form-submit`,priority:`priority-chip`,labelInput:`label-input`,labelOption:`label-option`,labelCreate:`label-create`,labelChip:`label-chip`,editDialog:`task-edit`,editDone:`task-edit-done`},iE=(e,t)=>L(e,t,()=>V),aE=(e,t)=>qn(j(e,()=>t)),oE=(e,t)=>{let n=aE(0,e.id===t)??-1;switch(e.kind){case`section`:return{expanded:`true`,current:void 0,tabindex:n};case`task`:return{expanded:aE(String(e.expanded),e.expandable),current:aE(`true`,e.status===`active`),tabindex:n}}},sE=e=>t=>{t.stopPropagation(),e()},cE=e=>`var(--p${String(e)})`,lE=e=>B`
-  <svg class="flag" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style=${`--flag: ${cE(e)}`}>
+`,ST=class extends H{static{this.properties={adding:{state:!0},creating:{state:!0},newName:{state:!0}}}static{this.styles=[U,xT]}constructor(){super(),this.link=W(this),this.ctl=bT(this),this.adding=!1,this.creating=!1,this.newName=``}connectedCallback(){super.connectedCallback(),this.ctl.connect()}disconnectedCallback(){super.disconnectedCallback(),this.ctl.disconnect()}render(){return G(this.link)((e,t)=>pT(tT(e),{todoist:t.integrations.todoist,adding:this.adding,creating:this.creating,newName:this.newName},yT(this,t)))}};customElements.define(`tt-project-menu`,ST);var CT={open:!1,query:``,expanded:new Set,focusId:void 0,notice:``,form:void 0,editId:void 0},wT=(e,t)=>{e.ui={...e.ui,...t}},TT=(e,t)=>{e.updateComplete.then(()=>{e.renderRoot.querySelector(t)?.focus()})},ET=`#tt-picker-input`,Z={focusRow:(e,t)=>{wT(e,{focusId:t}),TT(e,`[data-row-id="${CSS.escape(t)}"]`)},setExpanded:(e,t,n)=>{wT(e,{expanded:new Set([...e.ui.expanded].filter(e=>e!==t).concat([t].filter(()=>n)))})},close:e=>{wT(e,{open:!1}),TT(e,ET)},openForm:(e,t)=>{wT(e,{form:t,open:!1})},openEdit:(e,t)=>{wT(e,{editId:t,open:!1})},focusInput:e=>{TT(e,ET)}},DT=e=>k(D(e.pages.currentPageId),t=>E(e.pages.byId[t])),OT=(e,t)=>[{status:`active`,hit:e?.active.some(e=>e.taskId===t)??!1},{status:`queued`,hit:e?.queue.includes(t)??!1}].find(e=>e.hit)?.status??`none`,kT=(e,t)=>n=>{let r=t.store.getState();T(DT(r),{onNone:()=>void 0,onSome:i=>{let a=r.catalog.tasks[n]?.content??n,o=OT(i,n)!==`none`;R(o,()=>{globalThis.dispatchEvent(new CustomEvent(`tt:highlight-task`,{detail:n}))}),R(!o,()=>{t.store.dispatch({type:`pages/taskActivated`,at:t.now(),pageId:i.id,taskId:n})}),wT(e,{open:!1,query:``,focusId:void 0,notice:L(o,()=>`“${a}” is already in focus`,()=>`“${a}” added to focus`)})}})},AT=e=>e.normalize(`NFD`).replace(/\p{Diacritic}/gu,``).toLowerCase(),jT={kind:`none`},MT=e=>e.find(e=>e.hit)?.command()??jT,NT=(e,t)=>T(D(e[t]),{onNone:()=>jT,onSome:e=>({kind:`focus`,id:e.id})}),PT=e=>(t,n)=>{let r=t[n];return MT([{hit:r?.kind===`task`,command:()=>({kind:e,id:r?.id??``})}])},FT=(e,t)=>{let n=e[t],r=n?.kind===`section`||n?.kind===`task`&&n.expanded,i=(e[t+1]?.level??0)>(n?.level??0);return MT([{hit:n?.kind===`task`&&n.expandable&&!n.expanded,command:()=>({kind:`expand`,id:n?.id??``})},{hit:r&&i,command:()=>NT(e,t+1)}])},IT=(e,t)=>{let n=e[t],r=e.slice(0,t).findLastIndex(e=>e.level===(n?.level??0)-1);return MT([{hit:n?.kind===`task`&&n.expanded,command:()=>({kind:`collapse`,id:n?.id??``})},{hit:r>=0,command:()=>NT(e,r)}])},LT=e=>(t,n)=>{let r=AT(e);return NT(t,t.map((e,r)=>(n+1+r)%t.length).find(e=>AT(t[e]?.title??``).startsWith(r))??-1)},RT=new Map([[`ArrowDown`,(e,t)=>NT(e,Math.min(t+1,e.length-1))],[`ArrowUp`,(e,t)=>NT(e,Math.max(t-1,0))],[`Home`,e=>NT(e,0)],[`End`,e=>NT(e,e.length-1)],[`ArrowRight`,FT],[`ArrowLeft`,IT],[`Enter`,PT(`pick`)],[`F2`,PT(`edit`)],[`+`,PT(`subtask`)],[`Escape`,()=>({kind:`close`})]]),zT=e=>RT.get(e)??L(/^\S$/u.test(e),()=>LT(e),()=>()=>jT),BT=(e,t,n)=>zT(n)(e,Math.max(0,e.findIndex(e=>e.id===t))),VT=e=>(t,n)=>e(t)-e(n)||t.id.localeCompare(n.id),HT=e=>t=>t.toSorted(VT(e=>e.childOrder)).map(t=>{let n=HT(e)(e.filter(e=>e.parentId===t.id));return{task:t,children:n,subtasks:n.length}}),UT=(e,t)=>{let n=Object.values(e.tasks).filter(e=>e.projectId===t&&!e.checked),r=new Set(n.map(e=>e.id)),i=n.filter(e=>e.parentId===void 0||!r.has(e.parentId)),a=Object.values(e.sections).filter(e=>e.projectId===t).toSorted(VT(e=>e.sectionOrder)),o=new Set(a.map(e=>e.id)),s=HT(n);return[{section:void 0,variant:`section`,nodes:s(i.filter(e=>e.sectionId===void 0||!o.has(e.sectionId)))},...a.map(e=>({section:e,variant:`section`,nodes:s(i.filter(t=>t.sectionId===e.id))}))]},WT=e=>t=>t.flatMap(t=>{let n=WT(e)(t.children);return[{...t,children:n}].filter(()=>n.length>0||AT(t.task.content).includes(e))}),GT=e=>t=>{let n=AT(e.trim());return L(n.length===0,()=>t,()=>t.map(e=>({...e,nodes:WT(n)(e.nodes)})).filter(e=>e.nodes.length>0))},KT=e=>(t,n,r)=>t.flatMap((t,i)=>{let a=t.children.length>0,o=a&&e(t.task.id),s=t.children.filter(()=>o);return[{kind:`task`,id:t.task.id,title:t.task.content,task:t.task,level:n,setsize:r,posinset:i+1,expandable:a,expanded:o,subtasks:t.subtasks},...KT(e)(s,n+1,s.length)]}),qT=(e,t)=>{let n=KT(t),r=e.find(e=>e.section===void 0)?.nodes??[],i=e.flatMap(e=>Yn(D(e.section)).map(t=>({section:t,variant:e.variant,nodes:e.nodes}))),a=r.length+i.length;return[...n(r,1,a),...i.flatMap(({section:e,variant:t,nodes:i},o)=>[{kind:`section`,variant:t,id:`section:${e.id}`,title:e.name,level:1,setsize:a,posinset:r.length+o+1},...n(i,2,i.length)])]},JT=(e,t,n)=>{let r=[...new Set([Om,...Yn(D(e.sync.inboxProjectId))])].filter(e=>e!==t).flatMap(t=>GT(n)(UT(e.catalog,t)).flatMap(e=>e.nodes));return[{section:{id:Om,projectId:Om,name:`Inbox · ${String(r.length)}`,sectionOrder:0},variant:`inbox`,nodes:r}].filter(e=>e.nodes.length>0)},YT=e=>Object.values(e).reduce((e,t)=>new Map(e).set(t.taskId,(e.get(t.taskId)??0)+t.minutes),new Map),XT=e=>{let t=Math.floor(e/60),n=e%60;return[...[`${String(t)}h`].filter(()=>t>0),...[`${String(n).padStart(1+Number(t>0),`0`)}m`].filter(()=>n>0)].join(` `)},ZT=(e,t,n)=>[e.map(e=>`@${e}`).join(` `),...[`${String(t)} subtask${`s`.repeat(Number(t!==1))}`].filter(()=>t>0),XT(n)].filter(e=>e.length>0).join(` · `),QT=(e,t)=>n=>{switch(n.kind){case`section`:return n;case`task`:return{...n,meta:ZT(n.task.labels,n.subtasks,t.get(n.id)??0),status:OT(e,n.id)}}},$T=(e,t,n)=>T(DT(e),{onNone:()=>[],onSome:r=>{let i=t.trim().length>0;return qT([...GT(t)(UT(e.catalog,r.projectId)),...JT(e,r.projectId,t)],e=>i||n.has(e)).map(QT(r,YT(e.log.entries)))}}),eE=(e,t,n)=>{switch(n.kind){case`focus`:Z.focusRow(e,n.id);break;case`expand`:Z.setExpanded(e,n.id,!0);break;case`collapse`:Z.setExpanded(e,n.id,!1);break;case`pick`:kT(e,t)(n.id),Z.focusInput(e);break;case`edit`:Z.openEdit(e,n.id);break;case`subtask`:Z.openForm(e,{title:``,parentId:n.id});break;case`close`:Z.close(e)}},tE=(e,t)=>n=>{let r=$T(t.store.getState(),e.ui.query,e.ui.expanded),i=L(n.ctrlKey||n.altKey||n.metaKey,()=>``,()=>n.key),a=BT(r,e.ui.focusId,i);R(a.kind!==`none`,()=>{n.preventDefault()}),eE(e,t,a)},nE=new Map([[`ArrowDown`,(e,t)=>{wT(e,{open:!0,notice:``}),O(D($T(t.store.getState(),e.ui.query,e.ui.expanded)[0]),t=>{Z.focusRow(e,t.id)})}],[`Escape`,e=>{wT(e,{open:!1})}],[`Enter`,e=>{R(e.ui.query.trim().length>0,()=>{Z.openForm(e,{title:e.ui.query.trim(),parentId:void 0})})}]]),rE=(e,t)=>n=>{O(D(nE.get(n.key)),r=>{n.preventDefault(),r(e,t)})},iE=e=>u(j(e.target,e=>e instanceof HTMLInputElement||e instanceof HTMLSelectElement),T({onNone:()=>``,onSome:e=>e.value})),aE=(e,t)=>!(t.relatedTarget instanceof Node&&e.renderRoot.contains(t.relatedTarget)),oE=(e,t)=>({query:t=>{wT(e,{query:iE(t),open:!0,notice:``,focusId:void 0})},open:()=>{wT(e,{open:!0,notice:``})},inputKey:rE(e,t),treeKey:tE(e,t),focusOut:t=>{R(e.ui.open&&aE(e,t),()=>{wT(e,{open:!1})})},rowFocus:t=>{R(e.ui.focusId!==t,()=>{wT(e,{focusId:t})})},pick:kT(e,t),toggle:t=>{Z.setExpanded(e,t,!e.ui.expanded.has(t))},subtask:t=>{Z.openForm(e,{title:``,parentId:t})},edit:t=>{Z.openEdit(e,t)},create:()=>{Z.openForm(e,{title:e.ui.query.trim(),parentId:void 0})},formClosed:t=>{wT(e,{form:void 0,query:L(t,()=>``,()=>e.ui.query)}),Z.focusInput(e)},editClosed:()=>{wT(e,{editId:void 0}),Z.focusInput(e)}}),sE=e=>u(DT(e),k(t=>E(e.catalog.projects[t.projectId])),T({onNone:()=>`this project`,onSome:e=>e.name})),cE=e=>{let t=e.trim();return L(t.length>0,()=>`Create task “${t}” and start`,()=>`Create a task or subtask…`)},lE=(e,t,n,r)=>{let i=$T(e,t,n);return{enabled:Wn(DT(e)),project:sE(e),rows:i,rovingId:(i.find(e=>e.id===r)??i[0])?.id,prompt:cE(t),empty:L(t.trim().length>0,()=>`No tasks match “${t.trim()}”`,()=>`No open tasks in this project yet`)}},uE=e=>e??V,Q={input:`task-picker-input`,hint:`task-picker-hint`,notice:`task-picker-notice`,tree:`task-tree`,inboxHeading:`task-inbox-heading`,row:`task-row`,toggle:`task-toggle`,addSubtask:`task-add-subtask`,edit:`task-edit-open`,status:`task-status`,pending:`task-pending`,create:`task-create`,form:`task-form`,formTitle:`task-form-title`,formParent:`task-form-parent`,formSection:`task-form-section`,formFocus:`task-form-focus`,formSubmit:`task-form-submit`,priority:`priority-chip`,labelInput:`label-input`,labelOption:`label-option`,labelCreate:`label-create`,labelChip:`label-chip`,editDialog:`task-edit`,editDone:`task-edit-done`},dE=(e,t)=>L(e,t,()=>V),fE=(e,t)=>qn(j(e,()=>t)),pE=(e,t)=>{let n=fE(0,e.id===t)??-1;switch(e.kind){case`section`:return{expanded:`true`,current:void 0,tabindex:n};case`task`:return{expanded:fE(String(e.expanded),e.expandable),current:fE(`true`,e.status===`active`),tabindex:n}}},mE=e=>t=>{t.stopPropagation(),e()},hE=e=>`var(--p${String(e)})`,gE=e=>B`
+  <svg class="flag" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style=${`--flag: ${hE(e)}`}>
     <path d="M3 2v13M3 2.5c3-1.2 5 1.2 9 0v6c-4 1.2-6-1.2-9 0" stroke-width="1.6" stroke-linejoin="round"></path>
-  </svg>`,uE=(e,t)=>L(e.expandable,()=>B`
+  </svg>`,_E=(e,t)=>L(e.expandable,()=>B`
     <button class="ico toggle" tabindex="-1" data-testid=${Q.toggle} aria-expanded=${String(e.expanded)}
-      aria-label=${`Subtasks of ${e.title}`} @click=${sE(()=>{t.toggle(e.id)})}>
+      aria-label=${`Subtasks of ${e.title}`} @click=${mE(()=>{t.toggle(e.id)})}>
       <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" class="chev"><path d="M4 2.5l5.5 4.5L4 11.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-    </button>`,()=>B`<span class="toggle-space" aria-hidden="true"></span>`),dE=(e,t,n,r)=>{let i=oE(e,n);return B`
+    </button>`,()=>B`<span class="toggle-space" aria-hidden="true"></span>`),vE=(e,t,n,r)=>{let i=pE(e,n);return B`
     <li role="treeitem" class="row" data-testid=${Q.row} data-row-id=${e.id} data-priority=${e.task.priority}
       aria-label=${e.title} aria-describedby=${`tt-meta-${String(t)}`} aria-level=${e.level} aria-setsize=${e.setsize}
-      aria-posinset=${e.posinset} aria-expanded=${rE(i.expanded)} aria-current=${rE(i.current)}
+      aria-posinset=${e.posinset} aria-expanded=${uE(i.expanded)} aria-current=${uE(i.current)}
       tabindex=${i.tabindex} style=${`--level: ${String(e.level)}`}
       @click=${()=>{r.pick(e.id)}} @focus=${()=>{r.rowFocus(e.id)}}>
-      ${uE(e,r)}
-      ${lE(e.task.priority)}
+      ${_E(e,r)}
+      ${gE(e.task.priority)}
       <span class="title">${e.title}</span>
       <span class="meta" id=${`tt-meta-${String(t)}`}><span class="vh">P${e.task.priority}. </span>${e.meta}</span>
-      ${iE(e.status!==`none`,()=>B`<span class="badge" data-testid=${Q.status} data-status=${e.status}>${e.status}</span>`)}
-      ${iE(e.task.pending,()=>B`<span class="pending" data-testid=${Q.pending}>not synced</span>`)}
+      ${dE(e.status!==`none`,()=>B`<span class="badge" data-testid=${Q.status} data-status=${e.status}>${e.status}</span>`)}
+      ${dE(e.task.pending,()=>B`<span class="pending" data-testid=${Q.pending}>not synced</span>`)}
       <button class="ico act" tabindex="-1" data-testid=${Q.addSubtask} aria-label=${`Add a subtask to ${e.title}`}
-        @click=${sE(()=>{r.subtask(e.id)})}>+</button>
+        @click=${mE(()=>{r.subtask(e.id)})}>+</button>
       <button class="ico act" tabindex="-1" data-testid=${Q.edit} aria-label=${`Edit labels and priority of ${e.title}`}
-        @click=${sE(()=>{r.edit(e.id)})}>
+        @click=${mE(()=>{r.edit(e.id)})}>
         <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 15l1-4 8-8 3 3-8 8-4 1zM10.5 4.5l3 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path></svg>
       </button>
-    </li>`},fE={section:{cls:`section head`,testid:void 0},inbox:{cls:`section head inbox`,testid:Q.inboxHeading}},pE=(e,t)=>(n,r)=>{switch(n.kind){case`task`:return dE(n,r,e.rovingId,t);case`section`:return B`
-      <li role="treeitem" class=${fE[n.variant].cls} data-testid=${rE(fE[n.variant].testid)} data-row-id=${n.id} aria-label=${n.title} aria-level=${n.level}
-        aria-setsize=${n.setsize} aria-posinset=${n.posinset} aria-expanded="true" tabindex=${oE(n,e.rovingId).tabindex}
-        @focus=${()=>{t.rowFocus(n.id)}}>${n.title}</li>`}},mE=(e,t)=>B`
+    </li>`},yE={section:{cls:`section head`,testid:void 0},inbox:{cls:`section head inbox`,testid:Q.inboxHeading}},bE=(e,t)=>(n,r)=>{switch(n.kind){case`task`:return vE(n,r,e.rovingId,t);case`section`:return B`
+      <li role="treeitem" class=${yE[n.variant].cls} data-testid=${uE(yE[n.variant].testid)} data-row-id=${n.id} aria-label=${n.title} aria-level=${n.level}
+        aria-setsize=${n.setsize} aria-posinset=${n.posinset} aria-expanded="true" tabindex=${pE(n,e.rovingId).tabindex}
+        @focus=${()=>{t.rowFocus(n.id)}}>${n.title}</li>`}},xE=(e,t)=>B`
   <ol role="tree" id="tt-task-tree" class="tree" data-testid=${Q.tree} aria-label=${`Tasks of ${e.project}`} @keydown=${t.treeKey}>
-    ${dw(e.rows,e=>e.id,pE(e,t))}
-  </ol>`,hE=(e,t)=>B`
+    ${dw(e.rows,e=>e.id,bE(e,t))}
+  </ol>`,SE=(e,t)=>B`
   <section class="popup sk2" aria-label="Task picker">
-    ${L(e.rows.length>0,()=>mE(e,t),()=>B`<p class="empty muted">${e.empty}</p>`)}
+    ${L(e.rows.length>0,()=>xE(e,t),()=>B`<p class="empty muted">${e.empty}</p>`)}
     <button class="create" data-testid=${Q.create} @click=${t.create}>+ ${e.prompt}</button>
-  </section>`,gE=`tt-picker-hint`,_E=(e,t,n)=>B`
+  </section>`,CE=`tt-picker-hint`,wE=(e,t,n)=>B`
   <label for="tt-picker-input" class="vh">Pick or create a task</label>
   <section class="combo" @focusout=${n.focusOut}>
     <input id="tt-picker-input" class="inp sk" data-testid=${Q.input} role="combobox" autocomplete="off"
       aria-expanded=${String(t.open&&e.enabled)} aria-controls="tt-task-tree" aria-haspopup="tree" aria-autocomplete="list"
-      aria-describedby=${rE(qn(j(gE,()=>!e.enabled)))}
+      aria-describedby=${uE(qn(j(CE,()=>!e.enabled)))}
       placeholder="Pick a task or type a new one…" .value=${t.query} ?disabled=${!e.enabled}
       @input=${n.query} @click=${n.open} @keydown=${n.inputKey}>
-    ${iE(t.open&&e.enabled,()=>hE(e,n))}
+    ${dE(t.open&&e.enabled,()=>SE(e,n))}
   </section>
-  ${iE(!e.enabled,()=>B`<p id=${gE} class="hint muted" data-testid=${Q.hint}>Start today's page first</p>`)}
+  ${dE(!e.enabled,()=>B`<p id=${CE} class="hint muted" data-testid=${Q.hint}>Start today's page first</p>`)}
   <p class="notice" role="status" data-testid=${Q.notice}>${t.notice}</p>
   <tt-task-form .request=${t.form} .onClose=${n.formClosed}></tt-task-form>
-  <tt-task-edit .taskId=${t.editId} .onClose=${n.editClosed}></tt-task-edit>`,vE=z`
+  <tt-task-edit .taskId=${t.editId} .onClose=${n.editClosed}></tt-task-edit>`,TE=z`
   :host { display: block; }
   .combo { position: relative; }
   .inp:disabled { cursor: not-allowed; background: var(--hover); }
@@ -806,13 +825,13 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
     color: var(--break); cursor: pointer; border-radius: 0 0 8px 8px; }
   .create:hover { background: var(--hover); }
   @media (hover: none) { .act { opacity: 1; } }
-`,yE=e=>({title:e.title,parentId:e.parentId,sectionId:void 0,priority:4,labels:[],addToFocus:!0}),bE=e=>t=>T(E(e[t?.parentId??``]),{onNone:()=>0,onSome:t=>1+bE(e)(t)}),xE=e=>T(bT(e),{onNone:()=>[],onSome:t=>BT(IT(e.catalog,t.projectId),()=>!0).flatMap(t=>{switch(t.kind){case`section`:return[];case`task`:return[{id:t.id,label:`${`· `.repeat(bE(e.catalog.tasks)(t.task))}${t.title}`,sectionId:t.task.sectionId}]}})}),SE=(e,t)=>{let n=qn(O(bT(e),e=>e.projectId));return{draft:t,heading:L(t.parentId===void 0,()=>`New task`,()=>`New subtask`),parents:xE(e),sections:Object.values(e.catalog.sections).filter(e=>e.projectId===n).toSorted(PT(e=>e.sectionOrder))}},CE=(e,t,n,r,i)=>{let a=n.find(t=>t.id===e.parentId);return O(j(e.title.trim(),e=>e.length>0),n=>({type:`catalog/taskCreated`,at:i,tempId:`tmp-${r}`,uuid:r,projectId:t.projectId,parentId:a?.id,sectionId:Gn(O(D(a),e=>e.sectionId),()=>e.sectionId),content:n,priority:e.priority,labels:e.labels,pageId:qn(j(t.id,()=>e.addToFocus))}))},wE=e=>qn(j(e,e=>e.length>0)),TE=e=>e.target instanceof HTMLInputElement&&e.target.checked,EE=(e,t)=>{let n=t=>{e.draft={...e.draft,...t}};return{title:e=>{n({title:ZT(e)})},parent:e=>{n({parentId:wE(ZT(e))})},section:e=>{n({sectionId:wE(ZT(e))})},priority:e=>{n({priority:e})},labels:e=>{n({labels:e})},addToFocus:e=>{n({addToFocus:TE(e)})},cancel:()=>{e.onClose(!1)},submit:n=>{n.preventDefault();let r=t.store.getState(),i=t.newId();O(k(bT(r),n=>CE(e.draft,n,xE(r),i,t.now())),n=>{t.store.dispatch(n),e.onClose(!0)})}}},DE=(e,t)=>{O(E(e.querySelector(`dialog`)),e=>{R(t&&!e.open,()=>{e.showModal()}),R(!t&&e.open,()=>{e.close()})})},OE=[1,2,3,4],kE=(e,t)=>B`
+`,EE=e=>({title:e.title,parentId:e.parentId,sectionId:void 0,priority:4,labels:[],addToFocus:!0}),DE=e=>t=>T(E(e[t?.parentId??``]),{onNone:()=>0,onSome:t=>1+DE(e)(t)}),OE=e=>T(DT(e),{onNone:()=>[],onSome:t=>qT(UT(e.catalog,t.projectId),()=>!0).flatMap(t=>{switch(t.kind){case`section`:return[];case`task`:return[{id:t.id,label:`${`· `.repeat(DE(e.catalog.tasks)(t.task))}${t.title}`,sectionId:t.task.sectionId}]}})}),kE=(e,t)=>{let n=qn(O(DT(e),e=>e.projectId));return{draft:t,heading:L(t.parentId===void 0,()=>`New task`,()=>`New subtask`),parents:OE(e),sections:Object.values(e.catalog.sections).filter(e=>e.projectId===n).toSorted(VT(e=>e.sectionOrder))}},AE=(e,t,n,r,i)=>{let a=n.find(t=>t.id===e.parentId);return O(j(e.title.trim(),e=>e.length>0),n=>({type:`catalog/taskCreated`,at:i,tempId:`tmp-${r}`,uuid:r,projectId:t.projectId,parentId:a?.id,sectionId:Gn(O(D(a),e=>e.sectionId),()=>e.sectionId),content:n,priority:e.priority,labels:e.labels,pageId:qn(j(t.id,()=>e.addToFocus))}))},jE=e=>qn(j(e,e=>e.length>0)),ME=e=>e.target instanceof HTMLInputElement&&e.target.checked,NE=(e,t)=>{let n=t=>{e.draft={...e.draft,...t}};return{title:e=>{n({title:iE(e)})},parent:e=>{n({parentId:jE(iE(e))})},section:e=>{n({sectionId:jE(iE(e))})},priority:e=>{n({priority:e})},labels:e=>{n({labels:e})},addToFocus:e=>{n({addToFocus:ME(e)})},cancel:()=>{e.onClose(!1)},submit:n=>{n.preventDefault();let r=t.store.getState(),i=t.newId();O(k(DT(r),n=>AE(e.draft,n,OE(r),i,t.now())),n=>{t.store.dispatch(n),e.onClose(!0)})}}},PE=(e,t)=>{O(E(e.querySelector(`dialog`)),e=>{R(t&&!e.open,()=>{e.showModal()}),R(!t&&e.open,()=>{e.close()})})},FE=[1,2,3,4],IE=(e,t)=>B`
   <fieldset class="prio-set">
     <legend>Priority</legend>
-    ${OE.map(n=>B`
+    ${FE.map(n=>B`
       <button type="button" class="btn sk prio" data-testid=${Q.priority} aria-pressed=${String(n===e)}
-        @click=${()=>{t(n)}}>${lE(n)}P${n}</button>`)}
-  </fieldset>`,AE=(e,t)=>B`
+        @click=${()=>{t(n)}}>${gE(n)}P${n}</button>`)}
+  </fieldset>`,LE=(e,t)=>B`
   <label class="field">Inside task
     <select class="inp sk" data-testid=${Q.formParent} @change=${t.parent}>
       <option value="" ?selected=${e.draft.parentId===void 0}>— top level —</option>
@@ -824,15 +843,15 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
       <option value="" ?selected=${e.draft.sectionId===void 0}>No section</option>
       ${e.sections.map(t=>B`<option value=${t.id} ?selected=${t.id===e.draft.sectionId}>${t.name}</option>`)}
     </select>
-  </label>`,jE=(e,t,n)=>B`
+  </label>`,RE=(e,t,n)=>B`
   <dialog class="sk2" data-testid=${Q.form} aria-labelledby="tt-form-heading" @close=${n}>
     <form class="body" @submit=${t.submit}>
       <h2 id="tt-form-heading" class="head">${e.heading}</h2>
       <label class="field">Title
         <input class="inp sk" data-testid=${Q.formTitle} required autocomplete="off" .value=${e.draft.title} @input=${t.title}>
       </label>
-      ${AE(e,t)}
-      ${kE(e.draft.priority,t.priority)}
+      ${LE(e,t)}
+      ${IE(e.draft.priority,t.priority)}
       <tt-label-field .selected=${e.draft.labels} .onChange=${t.labels}></tt-label-field>
       <label class="check">
         <input type="checkbox" data-testid=${Q.formFocus} .checked=${e.draft.addToFocus} @change=${t.addToFocus}>
@@ -843,7 +862,7 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
         <button type="submit" class="btn sk primary" data-testid=${Q.formSubmit}>Create task</button>
       </footer>
     </form>
-  </dialog>`,ME=z`
+  </dialog>`,zE=z`
   dialog { width: min(520px, calc(100vw - 24px)); box-sizing: border-box; padding: 18px 20px; background: var(--card); color: var(--ink);
     box-shadow: var(--shadow); max-height: calc(100dvh - 24px); overflow: auto; }
   dialog::backdrop { background: rgb(35 34 43 / 35%); }
@@ -862,7 +881,7 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
   footer { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
   .primary { background: var(--ink); color: var(--card); }
   .primary:hover { background: var(--ink-soft); }
-`,NE=8,PE=(e,t,n)=>{let r=CT(t.trim()),i=new Set(n.map(CT)),a=[...e.activityLabels,...Object.values(e.labels).toSorted(PT(e=>e.order)).map(e=>e.name)];return a.filter((e,t)=>a.findIndex(t=>CT(t)===CT(e))===t).filter(e=>!i.has(CT(e))&&CT(e).includes(r)).slice(0,NE)},FE=(e,t)=>{let n=t.trim(),r=[...e.activityLabels,...Object.values(e.labels).map(e=>e.name)].map(e=>e.toLowerCase());return j(n,e=>e.length>0&&!r.includes(e.toLowerCase()))},IE=(e,t)=>{let n=t=>{e.text=``,e.onChange([...e.selected,t])},r=e=>{let r=t.newId();t.store.dispatch({type:`catalog/labelCreated`,at:t.now(),tempId:`tmp-${r}`,uuid:r,name:e}),n(e)};return{text:t=>{e.text=ZT(t)},remove:t=>{e.onChange(e.selected.filter(e=>e!==t))},add:n,create:r,enter:i=>{let a=t.store.getState().catalog,o=e.text.trim().length>0;O(j(i,e=>e.key===`Enter`&&o),t=>{t.preventDefault(),T(FE(a,e.text),{onSome:r,onNone:()=>{O(D(PE(a,e.text,e.selected)[0]),n)}})})}}},LE=(e,t)=>B`
+`,BE=8,VE=(e,t,n)=>{let r=AT(t.trim()),i=new Set(n.map(AT)),a=[...e.activityLabels,...Object.values(e.labels).toSorted(VT(e=>e.order)).map(e=>e.name)];return a.filter((e,t)=>a.findIndex(t=>AT(t)===AT(e))===t).filter(e=>!i.has(AT(e))&&AT(e).includes(r)).slice(0,BE)},HE=(e,t)=>{let n=t.trim(),r=[...e.activityLabels,...Object.values(e.labels).map(e=>e.name)].map(e=>e.toLowerCase());return j(n,e=>e.length>0&&!r.includes(e.toLowerCase()))},UE=(e,t)=>{let n=t=>{e.text=``,e.onChange([...e.selected,t])},r=e=>{let r=t.newId();t.store.dispatch({type:`catalog/labelCreated`,at:t.now(),tempId:`tmp-${r}`,uuid:r,name:e}),n(e)};return{text:t=>{e.text=iE(t)},remove:t=>{e.onChange(e.selected.filter(e=>e!==t))},add:n,create:r,enter:i=>{let a=t.store.getState().catalog,o=e.text.trim().length>0;O(j(i,e=>e.key===`Enter`&&o),t=>{t.preventDefault(),T(HE(a,e.text),{onSome:r,onNone:()=>{O(D(VE(a,e.text,e.selected)[0]),n)}})})}}},WE=(e,t)=>B`
   <fieldset>
     <legend>Labels</legend>
     <ul class="chosen" aria-label="Chosen labels">
@@ -878,7 +897,7 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
       ${T(e.creatable,{onNone:()=>V,onSome:e=>B`<li><button type="button" class="opt new" data-testid=${Q.labelCreate}
           @click=${()=>{t.create(e)}}>+ Create label “${e}”</button></li>`})}
     </ul>
-  </fieldset>`,RE=z`
+  </fieldset>`,GE=z`
   :host { display: block; }
   fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
   legend { font-size: 16px; color: var(--ink-soft); padding: 0; margin-bottom: 6px; }
@@ -890,22 +909,22 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
     background: var(--card); color: var(--ink); cursor: pointer; }
   .opt:hover { background: var(--hover); }
   .opt.new { color: var(--break); border-style: dashed; }
-`,zE=class extends H{static{this.properties={selected:{attribute:!1},onChange:{attribute:!1},text:{state:!0}}}static{this.styles=[U,RE]}constructor(){super(),this.link=W(this),this.selected=[],this.onChange=()=>void 0,this.text=``}render(){return G(this.link)((e,t)=>LE({selected:this.selected,text:this.text,suggestions:PE(e.catalog,this.text,this.selected),creatable:FE(e.catalog,this.text)},IE(this,t)))}};customElements.define(`tt-label-field`,zE);var BE=class extends H{static{this.properties={request:{attribute:!1},onClose:{attribute:!1},draft:{state:!0}}}static{this.styles=[U,ME]}constructor(){super(),this.link=W(this),this.request=void 0,this.onClose=()=>void 0,this.draft=yE({title:``,parentId:void 0})}willUpdate(e){R(e.has(`request`),()=>{O(D(this.request),e=>{this.draft=yE(e)})})}updated(){DE(this.renderRoot,this.request!==void 0)}render(){return G(this.link)((e,t)=>jE(SE(e,this.draft),EE(this,t),()=>{R(this.request!==void 0,()=>{this.onClose(!1)})}))}};customElements.define(`tt-task-form`,BE);var VE=(e,t)=>({priority:e=>n=>{R(n!==e.priority,()=>{t.store.dispatch({type:`catalog/priorityChanged`,at:t.now(),taskId:e.id,priority:n,uuid:t.newId()})})},labels:e=>n=>{t.store.dispatch({type:`catalog/labelsChanged`,at:t.now(),taskId:e.id,labels:n,uuid:t.newId()})},done:()=>{R(e.taskId!==void 0,e.onClose)}}),HE=(e,t)=>B`
+`,KE=class extends H{static{this.properties={selected:{attribute:!1},onChange:{attribute:!1},text:{state:!0}}}static{this.styles=[U,GE]}constructor(){super(),this.link=W(this),this.selected=[],this.onChange=()=>void 0,this.text=``}render(){return G(this.link)((e,t)=>WE({selected:this.selected,text:this.text,suggestions:VE(e.catalog,this.text,this.selected),creatable:HE(e.catalog,this.text)},UE(this,t)))}};customElements.define(`tt-label-field`,KE);var qE=class extends H{static{this.properties={request:{attribute:!1},onClose:{attribute:!1},draft:{state:!0}}}static{this.styles=[U,zE]}constructor(){super(),this.link=W(this),this.request=void 0,this.onClose=()=>void 0,this.draft=EE({title:``,parentId:void 0})}willUpdate(e){R(e.has(`request`),()=>{O(D(this.request),e=>{this.draft=EE(e)})})}updated(){PE(this.renderRoot,this.request!==void 0)}render(){return G(this.link)((e,t)=>RE(kE(e,this.draft),NE(this,t),()=>{R(this.request!==void 0,()=>{this.onClose(!1)})}))}};customElements.define(`tt-task-form`,qE);var JE=(e,t)=>({priority:e=>n=>{R(n!==e.priority,()=>{t.store.dispatch({type:`catalog/priorityChanged`,at:t.now(),taskId:e.id,priority:n,uuid:t.newId()})})},labels:e=>n=>{t.store.dispatch({type:`catalog/labelsChanged`,at:t.now(),taskId:e.id,labels:n,uuid:t.newId()})},done:()=>{R(e.taskId!==void 0,e.onClose)}}),YE=(e,t)=>B`
   <dialog class="sk2" data-testid=${Q.editDialog} aria-labelledby="tt-edit-heading" @close=${t.done}>
     ${T(e,{onNone:()=>V,onSome:e=>B`
         <section class="body">
           <h2 id="tt-edit-heading" class="head">${e.content}</h2>
-          ${kE(e.priority,t.priority(e))}
+          ${IE(e.priority,t.priority(e))}
           <tt-label-field .selected=${e.labels} .onChange=${t.labels(e)}></tt-label-field>
           <footer><button type="button" class="btn sk primary" data-testid=${Q.editDone} @click=${t.done}>Done</button></footer>
         </section>`})}
-  </dialog>`,UE=class extends H{static{this.properties={taskId:{attribute:!1},onClose:{attribute:!1}}}static{this.styles=[U,ME]}constructor(){super(),this.link=W(this),this.taskId=void 0,this.onClose=()=>void 0}updated(){DE(this.renderRoot,this.taskId!==void 0)}render(){return G(this.link)((e,t)=>HE(E(e.catalog.tasks[this.taskId??``]),VE(this,t)))}};customElements.define(`tt-task-edit`,UE);var WE=class extends H{static{this.properties={ui:{state:!0}}}static{this.styles=[U,vE]}constructor(){super(),this.link=W(this),this.ui=gT}render(){return G(this.link)((e,t)=>_E(nE(e,this.ui.query,this.ui.expanded,this.ui.focusId),this.ui,$T(this,t)))}};customElements.define(`tt-task-picker`,WE);var GE=(e,t)=>e.outbox.filter(e=>e.status===t).length,KE=[e=>e.connection===`disconnected`&&{kind:`local`,text:`local only`},e=>e.connection===`needsReconnect`&&{kind:`reconnect`,text:`reconnect Todoist`},e=>e.network===`offline`&&{kind:`offline`,text:`offline`},e=>GE(e,`failed`)>0&&{kind:`problem`,text:`sync problem`},e=>GE(e,`pending`)>0&&{kind:`pending`,text:`${String(GE(e,`pending`))} pending`}],qE=e=>KE.map(t=>t(e)).find(e=>e!==!1)||{kind:`synced`,text:`synced`},$={badge:`sync-badge`,settings:`settings-dialog`,settingsClose:`settings-close`,notice:`settings-notice`,connection:`settings-connection`,connect:`settings-connect`,disconnect:`settings-disconnect`,todoistToggle:`settings-todoist-toggle`,problems:`sync-problems`,problem:e=>`sync-problem-${e}`,retry:e=>`sync-retry-${e}`,discard:e=>`sync-discard-${e}`,labelInput:`settings-label-input`,labelAdd:`settings-label-add`,label:e=>`settings-label-${e}`,labelRemove:e=>`settings-label-remove-${e}`,timerField:e=>`settings-timer-${e}`},JE=(e,t)=>B`
+  </dialog>`,XE=class extends H{static{this.properties={taskId:{attribute:!1},onClose:{attribute:!1}}}static{this.styles=[U,zE]}constructor(){super(),this.link=W(this),this.taskId=void 0,this.onClose=()=>void 0}updated(){PE(this.renderRoot,this.taskId!==void 0)}render(){return G(this.link)((e,t)=>YE(E(e.catalog.tasks[this.taskId??``]),JE(this,t)))}};customElements.define(`tt-task-edit`,XE);var ZE=class extends H{static{this.properties={ui:{state:!0}}}static{this.styles=[U,TE]}constructor(){super(),this.link=W(this),this.ui=CT}render(){return G(this.link)((e,t)=>wE(lE(e,this.ui.query,this.ui.expanded,this.ui.focusId),this.ui,oE(this,t)))}};customElements.define(`tt-task-picker`,ZE);var QE=(e,t)=>e.outbox.filter(e=>e.status===t).length,$E=[e=>e.connection===`disconnected`&&{kind:`local`,text:`local only`},e=>e.connection===`needsReconnect`&&{kind:`reconnect`,text:`reconnect Todoist`},e=>e.network===`offline`&&{kind:`offline`,text:`offline`},e=>QE(e,`failed`)>0&&{kind:`problem`,text:`sync problem`},e=>QE(e,`pending`)>0&&{kind:`pending`,text:`${String(QE(e,`pending`))} pending`}],eD=e=>$E.map(t=>t(e)).find(e=>e!==!1)||{kind:`synced`,text:`synced`},$={badge:`sync-badge`,settings:`settings-dialog`,settingsClose:`settings-close`,notice:`settings-notice`,connection:`settings-connection`,connect:`settings-connect`,disconnect:`settings-disconnect`,todoistToggle:`settings-todoist-toggle`,problems:`sync-problems`,problem:e=>`sync-problem-${e}`,retry:e=>`sync-retry-${e}`,discard:e=>`sync-discard-${e}`,labelInput:`settings-label-input`,labelAdd:`settings-label-add`,label:e=>`settings-label-${e}`,labelRemove:e=>`settings-label-remove-${e}`,timerField:e=>`settings-timer-${e}`},tD=(e,t)=>B`
   <button type="button" class="chip" data-testid=${$.badge} data-kind=${e.kind}
     aria-label=${`Sync: ${e.text}. Open settings`} @click=${t}>
     <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5"></circle></svg>
     <span>${e.text}</span>
   </button>
-`,YE=z`
+`,nD=z`
   :host { display: inline-flex; }
   button { font: inherit; font-size: 16px; color: var(--ink); min-height: 44px; display: inline-flex; align-items: center; gap: 6px;
     cursor: pointer; padding: 2px 12px; }
@@ -915,7 +934,7 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
   [data-kind='pending'] circle { fill: var(--break); }
   [data-kind='problem'] circle, [data-kind='reconnect'] circle { fill: var(--warn); }
   [data-kind='problem'], [data-kind='reconnect'] { background: var(--warn-bg); }
-`,XE=class extends H{constructor(...e){super(...e),this.link=W(this)}static{this.styles=[U,YE]}render(){return G(this.link)((e,t)=>L(t.integrations.todoist,()=>JE(qE(e.sync),()=>{x_()}),()=>V))}};customElements.define(`tt-sync-badge`,XE);var ZE=(e,t)=>[e.args[t]].filter(e=>typeof e==`string`)[0]??``,QE={item_add:e=>`Create task “${ZE(e,`content`)}”`,item_close:()=>`Complete a task`,item_update:()=>`Update a task`,item_delete:()=>`Delete a task`,label_add:e=>`Create label “${ZE(e,`name`)}”`,note_add:e=>`Post time comment “${ZE(e,`content`)}”`,note_update:e=>`Update time comment “${ZE(e,`content`)}”`,note_delete:()=>`Delete a time comment`},$E=e=>QE[e.type](e),eD=e=>({connection:e.sync.connection,todoistEnabled:e.sync.todoistEnabled,problems:e.sync.outbox.filter(e=>e.status===`failed`).map(e=>({uuid:e.command.uuid,text:$E(e.command),error:e.error??`Unknown error`})),labels:e.catalog.activityLabels,timer:{focusMs:e.timer.settings.focusMs/6e4,shortBreakMs:e.timer.settings.shortBreakMs/6e4,longBreakMs:e.timer.settings.longBreakMs/6e4,longBreakEvery:e.timer.settings.longBreakEvery}}),tD=(e,t,n)=>B`
+`,rD=class extends H{constructor(...e){super(...e),this.link=W(this)}static{this.styles=[U,nD]}render(){return G(this.link)((e,t)=>L(t.integrations.todoist,()=>tD(eD(e.sync),()=>{x_()}),()=>V))}};customElements.define(`tt-sync-badge`,rD);var iD=(e,t)=>[e.args[t]].filter(e=>typeof e==`string`)[0]??``,aD={item_add:e=>`Create task “${iD(e,`content`)}”`,item_close:()=>`Complete a task`,item_update:()=>`Update a task`,item_delete:()=>`Delete a task`,label_add:e=>`Create label “${iD(e,`name`)}”`,note_add:e=>`Post time comment “${iD(e,`content`)}”`,note_update:e=>`Update time comment “${iD(e,`content`)}”`,note_delete:()=>`Delete a time comment`},oD=e=>aD[e.type](e),sD=e=>({connection:e.sync.connection,todoistEnabled:e.sync.todoistEnabled,problems:e.sync.outbox.filter(e=>e.status===`failed`).map(e=>({uuid:e.command.uuid,text:oD(e.command),error:e.error??`Unknown error`})),labels:e.catalog.activityLabels,timer:{focusMs:e.timer.settings.focusMs/6e4,shortBreakMs:e.timer.settings.shortBreakMs/6e4,longBreakMs:e.timer.settings.longBreakMs/6e4,longBreakEvery:e.timer.settings.longBreakEvery}}),cD=(e,t,n)=>B`
   <dialog data-testid=${$.settings} aria-labelledby="settings-title">
     <article class="sheet sk card">
       <header class="top">
@@ -926,20 +945,20 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
       ${t}
     </article>
   </dialog>
-`,nD=e=>B`<a class="btn sk" href="/api/oauth/start" data-testid=${$.connect}>${e}</a>`,rD={connected:e=>B`
+`,lD=e=>B`<a class="btn sk" href="/api/oauth/start" data-testid=${$.connect}>${e}</a>`,uD={connected:e=>B`
     <p data-testid=${$.connection}>Connected to Todoist.</p>
     <button type="button" class="btn sk2" data-testid=${$.disconnect} @click=${e.disconnect}>Disconnect</button>`,disconnected:()=>B`
-    <p data-testid=${$.connection}>Not connected: tasks and time entries stay on this device.</p>${nD(`Connect Todoist`)}`,needsReconnect:()=>B`
-    <p data-testid=${$.connection}>Todoist access expired. Queued changes are kept until you reconnect.</p>${nD(`Reconnect Todoist`)}`},iD=(e,t)=>B`
+    <p data-testid=${$.connection}>Not connected: tasks and time entries stay on this device.</p>${lD(`Connect Todoist`)}`,needsReconnect:()=>B`
+    <p data-testid=${$.connection}>Todoist access expired. Queued changes are kept until you reconnect.</p>${lD(`Reconnect Todoist`)}`},dD=(e,t)=>B`
   <section aria-labelledby="settings-todoist">
     <h3 id="settings-todoist" class="head">Todoist</h3>
-    ${rD[e.connection](t)}
+    ${uD[e.connection](t)}
     <label class="check">
       <input type="checkbox" data-testid=${$.todoistToggle} .checked=${e.todoistEnabled} @change=${t.toggleTodoist}>
       Send changes to Todoist (new tasks, completions, labels, time comments)
     </label>
   </section>
-`,aD=(e,t)=>B`
+`,fD=(e,t)=>B`
   <li class="problem" data-testid=${$.problem(e.uuid)}>
     <span>${e.text}</span>
     <span class="muted error">${e.error}</span>
@@ -948,13 +967,13 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
       <button type="button" class="btn sk2" data-testid=${$.discard(e.uuid)} @click=${()=>{t.discard(e.uuid)}}>Discard</button>
     </span>
   </li>
-`,oD=(e,t)=>B`
+`,pD=(e,t)=>B`
   <section aria-labelledby="settings-problems">
     <h3 id="settings-problems" class="head">Sync problems</h3>
-    <ol class="problems" data-testid=${$.problems}>${e.problems.map(e=>aD(e,t))}</ol>
+    <ol class="problems" data-testid=${$.problems}>${e.problems.map(e=>fD(e,t))}</ol>
     <p class="muted" ?hidden=${e.problems.length>0}>No sync problems.</p>
   </section>
-`,sD=(e,t)=>B`
+`,mD=(e,t)=>B`
   <section aria-labelledby="settings-labels">
     <h3 id="settings-labels" class="head">Activity labels</h3>
     <ul class="chips">
@@ -971,11 +990,11 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
       <button type="submit" class="btn sk2" data-testid=${$.labelAdd}>Add</button>
     </form>
   </section>
-`,cD=[{field:`focusMs`,label:`Focus, minutes`,max:240},{field:`shortBreakMs`,label:`Short break, minutes`,max:240},{field:`longBreakMs`,label:`Long break, minutes`,max:240},{field:`longBreakEvery`,label:`Long break every N focuses`,max:12}],lD=(e,t)=>B`
+`,hD=[{field:`focusMs`,label:`Focus, minutes`,max:240},{field:`shortBreakMs`,label:`Short break, minutes`,max:240},{field:`longBreakMs`,label:`Long break, minutes`,max:240},{field:`longBreakEvery`,label:`Long break every N focuses`,max:12}],gD=(e,t)=>B`
   <section aria-labelledby="settings-timer">
     <h3 id="settings-timer" class="head">Timer intervals</h3>
     <ul class="fields">
-      ${cD.map(({field:n,label:r,max:i})=>B`
+      ${hD.map(({field:n,label:r,max:i})=>B`
         <li>
           <label for=${`settings-${n}`}>${r}</label>
           <input id=${`settings-${n}`} class="inp sk num" type="number" inputmode="numeric" min="1" max=${i} step="1"
@@ -983,14 +1002,14 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
         </li>`)}
     </ul>
   </section>
-`,uD=(e,t)=>B`
-  ${iD(e,t)}
-  ${oD(e,t)}
-`,dD=(e,t,n)=>B`
-  ${L(n.todoist,()=>uD(e,t),()=>V)}
-  ${sD(e,t)}
-  ${lD(e,t)}
-`,fD=e=>j(e.currentTarget,e=>e instanceof HTMLInputElement),pD=(e,t)=>w(t.trim().replace(/^@/,``).trim()).pipe(A(t=>t.length>0&&!e.includes(t)),O(t=>[...e,t])),mD=e=>j(e.currentTarget,e=>e instanceof HTMLFormElement),hD=e=>t=>{t.preventDefault(),O(mD(t),t=>{let n=[new FormData(t).get(`label`)].filter(e=>typeof e==`string`)[0]??``;O(pD(e.store.getState().catalog.activityLabels,n),t=>{e.store.dispatch({type:`catalog/activityLabelsSet`,at:e.now(),names:t})}),t.reset()})},gD=e=>()=>e(`/api/oauth/disconnect`,{method:`POST`,credentials:`same-origin`,headers:{"x-requested-with":`tt`}}).then(e=>e.ok,()=>!1),_D=(e,t)=>e.filter(e=>e!==t),vD={focusMs:{unitMs:6e4,max:240},shortBreakMs:{unitMs:6e4,max:240},longBreakMs:{unitMs:6e4,max:240},longBreakEvery:{unitMs:1,max:12}},yD=(e,t,n)=>w(Number(n.trim())).pipe(A(e=>n.trim()!==``&&Number.isInteger(e)&&e>=1&&e<=vD[t].max),O(n=>({...e,[t]:n*vD[t].unitMs}))),bD=(e,t)=>{let n=t.now,r=t.store.dispatch;return{toggleTodoist:e=>{O(fD(e),e=>{r({type:`sync/todoistToggled`,at:n(),enabled:e.checked})})},disconnect:()=>{gD(globalThis.fetch.bind(globalThis))().then(t=>{L(t,()=>{r({type:`sync/connectionChanged`,at:n(),connection:`disconnected`})},()=>{e.notice=`Disconnect failed, try again.`})})},retry:e=>{r({type:`sync/retried`,at:n(),uuid:e})},discard:e=>{r({type:`sync/discarded`,at:n(),uuid:e})},addLabel:hD(t),removeLabel:e=>{r({type:`catalog/activityLabelsSet`,at:n(),names:_D(t.store.getState().catalog.activityLabels,e)})},changeTimer:e=>i=>{O(fD(i),i=>{O(yD(t.store.getState().timer.settings,e,i.value),e=>{r({type:`timer/settingsChanged`,at:n(),settings:e})})})}}},xD=rf(hf({notice:sf(I)})),SD=e=>j(e,e=>e instanceof CustomEvent).pipe(k(e=>xD(e.detail)),k(e=>D(e.notice)),qn),CD=e=>Array.from(e.renderRoot.querySelectorAll(`dialog`)),wD=e=>{let t=t=>{e.notice=SD(t),e.updateComplete.then(()=>{CD(e).forEach(e=>{R(!e.open,()=>{e.showModal()})})})};return{connect:()=>{globalThis.addEventListener(`tt:open-settings`,t)},disconnect:()=>{globalThis.removeEventListener(`tt:open-settings`,t)},close:()=>{CD(e).forEach(e=>{e.close()})}}},TD=z`
+`,_D=(e,t)=>B`
+  ${dD(e,t)}
+  ${pD(e,t)}
+`,vD=(e,t,n)=>B`
+  ${L(n.todoist,()=>_D(e,t),()=>V)}
+  ${mD(e,t)}
+  ${gD(e,t)}
+`,yD=e=>j(e.currentTarget,e=>e instanceof HTMLInputElement),bD=(e,t)=>w(t.trim().replace(/^@/,``).trim()).pipe(A(t=>t.length>0&&!e.includes(t)),O(t=>[...e,t])),xD=e=>j(e.currentTarget,e=>e instanceof HTMLFormElement),SD=e=>t=>{t.preventDefault(),O(xD(t),t=>{let n=[new FormData(t).get(`label`)].filter(e=>typeof e==`string`)[0]??``;O(bD(e.store.getState().catalog.activityLabels,n),t=>{e.store.dispatch({type:`catalog/activityLabelsSet`,at:e.now(),names:t})}),t.reset()})},CD=e=>()=>e(`/api/oauth/disconnect`,{method:`POST`,credentials:`same-origin`,headers:{"x-requested-with":`tt`}}).then(e=>e.ok,()=>!1),wD=(e,t)=>e.filter(e=>e!==t),TD={focusMs:{unitMs:6e4,max:240},shortBreakMs:{unitMs:6e4,max:240},longBreakMs:{unitMs:6e4,max:240},longBreakEvery:{unitMs:1,max:12}},ED=(e,t,n)=>w(Number(n.trim())).pipe(A(e=>n.trim()!==``&&Number.isInteger(e)&&e>=1&&e<=TD[t].max),O(n=>({...e,[t]:n*TD[t].unitMs}))),DD=(e,t)=>{let n=t.now,r=t.store.dispatch;return{toggleTodoist:e=>{O(yD(e),e=>{r({type:`sync/todoistToggled`,at:n(),enabled:e.checked})})},disconnect:()=>{CD(globalThis.fetch.bind(globalThis))().then(t=>{L(t,()=>{r({type:`sync/connectionChanged`,at:n(),connection:`disconnected`})},()=>{e.notice=`Disconnect failed, try again.`})})},retry:e=>{r({type:`sync/retried`,at:n(),uuid:e})},discard:e=>{r({type:`sync/discarded`,at:n(),uuid:e})},addLabel:SD(t),removeLabel:e=>{r({type:`catalog/activityLabelsSet`,at:n(),names:wD(t.store.getState().catalog.activityLabels,e)})},changeTimer:e=>i=>{O(yD(i),i=>{O(ED(t.store.getState().timer.settings,e,i.value),e=>{r({type:`timer/settingsChanged`,at:n(),settings:e})})})}}},OD=rf(hf({notice:sf(I)})),kD=e=>j(e,e=>e instanceof CustomEvent).pipe(k(e=>OD(e.detail)),k(e=>D(e.notice)),qn),AD=e=>Array.from(e.renderRoot.querySelectorAll(`dialog`)),jD=e=>{let t=t=>{e.notice=kD(t),e.updateComplete.then(()=>{AD(e).forEach(e=>{R(!e.open,()=>{e.showModal()})})})};return{connect:()=>{globalThis.addEventListener(`tt:open-settings`,t)},disconnect:()=>{globalThis.removeEventListener(`tt:open-settings`,t)},close:()=>{AD(e).forEach(e=>{e.close()})}}},MD=z`
   dialog { padding: 0; border: 0; background: transparent; color: inherit; width: min(560px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); }
   dialog::backdrop { background: color-mix(in srgb, var(--ink) 35%, transparent); }
   .sheet { box-sizing: border-box; padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: var(--shadow); }
@@ -1014,4 +1033,4 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
   a.btn { text-decoration: none; align-self: flex-start; }
   .btn { align-self: flex-start; }
   [hidden] { display: none; }
-`,ED=class extends H{static{this.properties={notice:{state:!0}}}static{this.styles=[U,TD]}constructor(){super(),this.link=W(this),this.ctl=wD(this),this.notice=void 0}connectedCallback(){super.connectedCallback(),this.ctl.connect()}disconnectedCallback(){super.disconnectedCallback(),this.ctl.disconnect()}render(){let e=G(this.link)((e,t)=>dD(eD(e),bD(this,t),t.integrations));return tD(this.notice,e,this.ctl.close)}};customElements.define(`tt-settings-dialog`,ED),(async()=>{let e=np(await $f()),t=await Ns(e.load),n=Kn(rp(),()=>t),r=W_({ASSETS_PREFIX:void 0,BASE_URL:`/focus-tracker/`,DEV:!1,MODE:`production`,PROD:!0,SITE:void 0,SSR:!1}),i=ip(Sg)(K_(r)(Gn(n,()=>wg(Date.now())))),a=Eg(i,r);[Dg,Og(e),...U_].forEach(e=>e(a)),Array.from(document.getElementsByTagName(`tt-app`)).filter(e=>e instanceof _y).forEach(e=>{e.services=a}),i.dispatch({type:`timer/ticked`,at:a.now()})})();
+`,ND=class extends H{static{this.properties={notice:{state:!0}}}static{this.styles=[U,MD]}constructor(){super(),this.link=W(this),this.ctl=jD(this),this.notice=void 0}connectedCallback(){super.connectedCallback(),this.ctl.connect()}disconnectedCallback(){super.disconnectedCallback(),this.ctl.disconnect()}render(){let e=G(this.link)((e,t)=>vD(sD(e),DD(this,t),t.integrations));return cD(this.notice,e,this.ctl.close)}};customElements.define(`tt-settings-dialog`,ND),(async()=>{let e=np(await $f()),t=await Ns(e.load),n=Kn(rp(),()=>t),r=W_({ASSETS_PREFIX:void 0,BASE_URL:`/focus-tracker/`,DEV:!1,MODE:`production`,PROD:!0,SITE:void 0,SSR:!1}),i=ip(Sg)(K_(r)(Gn(n,()=>wg(Date.now())))),a=Eg(i,r);[Dg,Og(e),...U_].forEach(e=>e(a)),Array.from(document.getElementsByTagName(`tt-app`)).filter(e=>e instanceof _y).forEach(e=>{e.services=a}),i.dispatch({type:`timer/ticked`,at:a.now()})})();
