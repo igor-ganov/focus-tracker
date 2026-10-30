@@ -579,7 +579,8 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
   dialog { padding: 0; border: 0; color: inherit; background: transparent; max-inline-size: 100vw; max-block-size: 100dvh; }
   dialog[open] { display: flex; }
   dialog::backdrop { background: color-mix(in srgb, var(--ink) 35%, transparent); }
-  .sheet { flex: 1; min-block-size: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; padding: 12px 14px;
+  /* min-inline-size 0: a long unbreakable title must not widen the sheet past the screen. */
+  .sheet { flex: 1; min-block-size: 0; min-inline-size: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; padding: 12px 14px;
     background: var(--paper); background-image: radial-gradient(var(--paper-dot) 1px, transparent 1px); background-size: 22px 22px; }
   p, h3 { margin: 0; }
   .body { flex: 1; min-block-size: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 6px; }
@@ -625,39 +626,41 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
   .typed .inp[aria-invalid='true'] { border-color: var(--warn); }
   .go { background: var(--break); border-color: var(--ink); font-size: 20px; }
   @media (min-width: 900px) { dialog[open] { margin: auto; } .sheet { border-radius: var(--r-a); border: 2.5px solid var(--ink); } }
-`,_T=e=>I(e>0,()=>E_(e),()=>``),vT=[`start`,`change`],yT=e=>vT.includes(e),bT=(e,t)=>C(e.link.services(),{onNone:()=>0,onSome:e=>[e.store.getState().timer.track.lastLimitMs,e.store.getState().timer.track.limitMs][Number(t===`change`)]??0}),xT=e=>{let t=t=>{A(t,e=>e instanceof CustomEvent).pipe(D(e=>e.detail),k(yT),D(t=>{e.text=_T(bT(e,t)),e.mode=t,e.updateComplete.then(()=>{D(T(e.renderRoot.querySelector(`dialog`)),e=>{L(!e.open,()=>{e.showModal()})})})}))};return{connect:()=>{globalThis.addEventListener(XS,t)},disconnect:()=>{globalThis.removeEventListener(XS,t)}}},ST=e=>{D(T(e.renderRoot.querySelector(`dialog`)),e=>{e.close()}),e.mode=void 0},CT={start:(e,t)=>({type:`timer/trackStarted`,at:e,limitMs:t}),change:(e,t)=>({type:`timer/trackLimitChanged`,at:e,limitMs:t})},wT=(e,t,n)=>({choose:t=>{e.text=_T(t*6e4)},type:t=>{e.text=t},submit:()=>{D(uT(e.text),r=>{tC(),t.store.dispatch(CT[n](t.now(),r)),Qb(t),ST(e)})},cancel:()=>{ST(e)}}),TT=class extends H{static{this.properties={mode:{state:!0},text:{state:!0}}}static{this.styles=[U,iT,gT]}constructor(){super(),this.link=W(this),this.events=xT(this),this.mode=void 0,this.text=``}connectedCallback(){super.connectedCallback(),this.events.connect()}disconnectedCallback(){super.disconnectedCallback(),this.events.disconnect()}render(){let e=G(this.link)((e,t)=>C(E(this.mode),{onNone:()=>V,onSome:n=>hT(pT(e,n,this.text),this.text,wT(this,t,n))}));return B`<dialog aria-labelledby="track-title" data-testid=${K.trackSheet} @close=${()=>{this.mode=void 0}}>${e}</dialog>`}};customElements.define(`tt-track-sheet`,TT);var ET=e=>e.normalize(`NFD`).replace(/\p{Diacritic}/gu,``).toLowerCase(),DT=(e,t=[])=>{let n=[...e.activityLabels,...Object.values(e.labels).toSorted(eh(e=>e.order)).map(e=>e.name),...t].filter(e=>e!==``);return n.filter((e,t)=>n.findIndex(t=>ET(t)===ET(e))===t)},OT=e=>Math.round(DC(e)/6e4),kT=e=>String(e).padStart(2,`0`),AT=e=>{let t=Math.floor(e/60);return I(t>0,()=>`${String(t)}h ${kT(e%60)}`,()=>`${String(e)}m`)},jT=(e,t)=>`${String(e)} ${t}${`s`.repeat(Number(e!==1))}`,MT=e=>[[Math.floor(e/60),`hour`],[e%60,`minute`]].filter(([e])=>e>0).map(([e,t])=>jT(e,t)).join(` `)||jT(0,`minute`),NT=e=>`${String(Math.floor(e/60))}:${String(e%60).padStart(2,`0`)}`,PT=e=>`${I(e<0,()=>`−`,()=>`+`)}${AT(Math.abs(e))}`,FT=(e,t,n,r)=>{let i=w(n,()=>t),a=Math.round(e/6e4),o=I(i!==a,()=>` · adjusted ${PT(i-a)}`,()=>``);return{minutes:i,valueText:AT(i),max:Math.max(240,2*t,i),valueWords:MT(i),typedText:w(r,()=>NT(i)),invalid:er(r,e=>S(lT(e))),metaText:`measured ${AT(a)}${o}`,adjusted:i!==a}},IT=(e,t)=>e.tasks[t]?.content??`Untitled task`,LT=(e,t)=>{let n=bp(e.log.entries,t.pageId,t.taskId),r=IT(e.catalog,t.taskId),i=DT(e.catalog,[...e.catalog.tasks[t.taskId]?.labels??[],t.label]);return{title:`Complete: ${r}`,name:r,field:FT(n.pipe(D(e=>e.accruedMs),w(()=>0)),n.pipe(D(OT),w(()=>0)),t.minutes,t.typed),labels:i.map(e=>({name:e,pressed:e===t.label})),note:t.note}},RT={ATTRIBUTE:1,CHILD:2,PROPERTY:3,BOOLEAN_ATTRIBUTE:4,EVENT:5,ELEMENT:6},zT=e=>(...t)=>({_$litDirective$:e,values:t}),BT=class{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,t,n){this._$Ct=e,this._$AM=t,this._$Ci=n}_$AS(e,t){return this.update(e,t)}update(e,t){return this.render(...t)}},{I:VT}=ib,HT=e=>e,UT=e=>e.strings===void 0,WT=()=>document.createComment(``),GT=(e,t,n)=>{let r=e._$AA.parentNode,i=t===void 0?e._$AB:t._$AA;if(n===void 0)n=new VT(r.insertBefore(WT(),i),r.insertBefore(WT(),i),e,e.options);else{let t=n._$AB.nextSibling,a=n._$AM,o=a!==e;if(o){let t;n._$AQ?.(e),n._$AM=e,n._$AP!==void 0&&(t=e._$AU)!==a._$AU&&n._$AP(t)}if(t!==i||o){let e=n._$AA;for(;e!==t;){let t=HT(e).nextSibling;HT(r).insertBefore(e,i),e=t}}}return n},KT=(e,t,n=e)=>(e._$AI(t,n),e),qT={},JT=(e,t=qT)=>e._$AH=t,YT=e=>e._$AH,XT=e=>{e._$AR(),e._$AA.remove()},ZT=zT(class extends BT{constructor(e){if(super(e),e.type!==RT.PROPERTY&&e.type!==RT.ATTRIBUTE&&e.type!==RT.BOOLEAN_ATTRIBUTE)throw Error("The `live` directive is not allowed on child or event bindings");if(!UT(e))throw Error("`live` bindings can only contain a single expression")}render(e){return e}update(e,[t]){if(t===Wy||t===V)return t;let n=e.element,r=e.name;if(e.type===RT.PROPERTY){if(t===n[r])return Wy}else if(e.type===RT.BOOLEAN_ATTRIBUTE){if(!!t===n.hasAttribute(r))return Wy}else if(e.type===RT.ATTRIBUTE&&n.getAttribute(r)===t+``)return Wy;return JT(e),t}}),J={complete:`complete-dialog`,completeTitle:`complete-dialog-title`,completeValue:`complete-dialog-value`,completeSlider:`complete-dialog-slider`,completeTyped:`complete-dialog-typed`,completeTypedError:`complete-dialog-typed-error`,completeMeta:`complete-dialog-meta`,completeChip:e=>`complete-dialog-label-${e}`,completeNew:`complete-dialog-new`,completeNewInput:`complete-dialog-new-input`,completeNote:`complete-dialog-note`,completeConfirm:`complete-dialog-confirm`,completeCancel:`complete-dialog-cancel`,summary:`day-summary`,total:`day-summary-total`,intervals:`day-summary-intervals`,bar:e=>`day-summary-bar-${e}`,entry:e=>`day-entry-${e}`,entryLabel:e=>`day-entry-label-${e}`,entryEdit:e=>`day-entry-edit-${e}`,entryDelete:e=>`day-entry-delete-${e}`,editMinutes:`day-entry-edit-minutes`,editLabel:`day-entry-edit-label`,editNote:`day-entry-edit-note`,editSave:`day-entry-edit-save`,undo:`day-entry-undo`,exportCsv:`day-summary-export`},QT=(e,t)=>I(e,t,()=>V),$T=(e,t,n,r)=>B`
+`,_T=e=>I(e>0,()=>E_(e),()=>``),vT=[`start`,`change`],yT=e=>vT.includes(e),bT=(e,t)=>C(e.link.services(),{onNone:()=>0,onSome:e=>[e.store.getState().timer.track.lastLimitMs,e.store.getState().timer.track.limitMs][Number(t===`change`)]??0}),xT=e=>{let t=t=>{A(t,e=>e instanceof CustomEvent).pipe(D(e=>e.detail),k(yT),D(t=>{e.text=_T(bT(e,t)),e.mode=t,e.updateComplete.then(()=>{D(T(e.renderRoot.querySelector(`dialog`)),e=>{L(!e.open,()=>{e.showModal()})})})}))};return{connect:()=>{globalThis.addEventListener(XS,t)},disconnect:()=>{globalThis.removeEventListener(XS,t)}}},ST=e=>{D(T(e.renderRoot.querySelector(`dialog`)),e=>{e.close()}),e.mode=void 0},CT={start:(e,t)=>({type:`timer/trackStarted`,at:e,limitMs:t}),change:(e,t)=>({type:`timer/trackLimitChanged`,at:e,limitMs:t})},wT=(e,t,n)=>({choose:t=>{e.text=_T(t*6e4)},type:t=>{e.text=t},submit:()=>{D(uT(e.text),r=>{tC(),t.store.dispatch(CT[n](t.now(),r)),Qb(t),ST(e)})},cancel:()=>{ST(e)}}),TT=class extends H{static{this.properties={mode:{state:!0},text:{state:!0}}}static{this.styles=[U,iT,gT]}constructor(){super(),this.link=W(this),this.events=xT(this),this.mode=void 0,this.text=``}connectedCallback(){super.connectedCallback(),this.events.connect()}disconnectedCallback(){super.disconnectedCallback(),this.events.disconnect()}render(){let e=G(this.link)((e,t)=>C(E(this.mode),{onNone:()=>V,onSome:n=>hT(pT(e,n,this.text),this.text,wT(this,t,n))}));return B`<dialog aria-labelledby="track-title" data-testid=${K.trackSheet} @close=${()=>{this.mode=void 0}}>${e}</dialog>`}};customElements.define(`tt-track-sheet`,TT);var ET=e=>e.normalize(`NFD`).replace(/\p{Diacritic}/gu,``).toLowerCase(),DT=(e,t=[])=>{let n=[...e.activityLabels,...Object.values(e.labels).toSorted(eh(e=>e.order)).map(e=>e.name),...t].filter(e=>e!==``);return n.filter((e,t)=>n.findIndex(t=>ET(t)===ET(e))===t)},OT=e=>Math.round(DC(e)/6e4),kT=e=>String(e).padStart(2,`0`),AT=e=>{let t=Math.floor(e/60);return I(t>0,()=>`${String(t)}h ${kT(e%60)}`,()=>`${String(e)}m`)},jT=(e,t)=>`${String(e)} ${t}${`s`.repeat(Number(e!==1))}`,MT=e=>[[Math.floor(e/60),`hour`],[e%60,`minute`]].filter(([e])=>e>0).map(([e,t])=>jT(e,t)).join(` `)||jT(0,`minute`),NT=e=>`${String(Math.floor(e/60))}:${String(e%60).padStart(2,`0`)}`,PT=e=>`${I(e<0,()=>`−`,()=>`+`)}${AT(Math.abs(e))}`,FT=(e,t,n,r)=>{let i=w(n,()=>t),a=Math.round(e/6e4),o=I(i!==a,()=>` · adjusted ${PT(i-a)}`,()=>``);return{minutes:i,valueText:AT(i),max:Math.max(240,2*t,i),valueWords:MT(i),typedText:w(r,()=>NT(i)),invalid:er(r,e=>S(lT(e))),metaText:`measured ${AT(a)}${o}`,adjusted:i!==a}},IT=(e,t)=>e.tasks[t]?.content??`Untitled task`,LT=(e,t)=>{let n=bp(e.log.entries,t.pageId,t.taskId),r=IT(e.catalog,t.taskId),i=DT(e.catalog,[...e.catalog.tasks[t.taskId]?.labels??[],t.label]);return{title:`Complete: ${r}`,name:r,field:FT(n.pipe(D(e=>e.accruedMs),w(()=>0)),n.pipe(D(OT),w(()=>0)),t.minutes,t.typed),labels:i.map(e=>({name:e,pressed:e===t.label})),note:t.note}},RT={ATTRIBUTE:1,CHILD:2,PROPERTY:3,BOOLEAN_ATTRIBUTE:4,EVENT:5,ELEMENT:6},zT=e=>(...t)=>({_$litDirective$:e,values:t}),BT=class{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,t,n){this._$Ct=e,this._$AM=t,this._$Ci=n}_$AS(e,t){return this.update(e,t)}update(e,t){return this.render(...t)}},{I:VT}=ib,HT=e=>e,UT=e=>e.strings===void 0,WT=()=>document.createComment(``),GT=(e,t,n)=>{let r=e._$AA.parentNode,i=t===void 0?e._$AB:t._$AA;if(n===void 0)n=new VT(r.insertBefore(WT(),i),r.insertBefore(WT(),i),e,e.options);else{let t=n._$AB.nextSibling,a=n._$AM,o=a!==e;if(o){let t;n._$AQ?.(e),n._$AM=e,n._$AP!==void 0&&(t=e._$AU)!==a._$AU&&n._$AP(t)}if(t!==i||o){let e=n._$AA;for(;e!==t;){let t=HT(e).nextSibling;HT(r).insertBefore(e,i),e=t}}}return n},KT=(e,t,n=e)=>(e._$AI(t,n),e),qT={},JT=(e,t=qT)=>e._$AH=t,YT=e=>e._$AH,XT=e=>{e._$AR(),e._$AA.remove()},ZT=zT(class extends BT{constructor(e){if(super(e),e.type!==RT.PROPERTY&&e.type!==RT.ATTRIBUTE&&e.type!==RT.BOOLEAN_ATTRIBUTE)throw Error("The `live` directive is not allowed on child or event bindings");if(!UT(e))throw Error("`live` bindings can only contain a single expression")}render(e){return e}update(e,[t]){if(t===Wy||t===V)return t;let n=e.element,r=e.name;if(e.type===RT.PROPERTY){if(t===n[r])return Wy}else if(e.type===RT.BOOLEAN_ATTRIBUTE){if(!!t===n.hasAttribute(r))return Wy}else if(e.type===RT.ATTRIBUTE&&n.getAttribute(r)===t+``)return Wy;return JT(e),t}}),J={complete:`complete-dialog`,completeTitle:`complete-dialog-title`,completeValue:`complete-dialog-value`,completeSlider:`complete-dialog-slider`,completeTyped:`complete-dialog-typed`,completeTypedError:`complete-dialog-typed-error`,completeMeta:`complete-dialog-meta`,completeChip:e=>`complete-dialog-label-${e}`,completeNew:`complete-dialog-new`,completeNewInput:`complete-dialog-new-input`,completeNote:`complete-dialog-note`,completeConfirm:`complete-dialog-confirm`,completeCancel:`complete-dialog-cancel`,summary:`day-summary`,total:`day-summary-total`,intervals:`day-summary-intervals`,bar:e=>`day-summary-bar-${e}`,entry:e=>`day-entry-${e}`,entryLabel:e=>`day-entry-label-${e}`,entryEdit:e=>`day-entry-edit-${e}`,entryDelete:e=>`day-entry-delete-${e}`,editMinutes:`day-entry-edit-minutes`,editLabel:`day-entry-edit-label`,editNote:`day-entry-edit-note`,editSave:`day-entry-edit-save`,undo:`day-entry-undo`,exportCsv:`day-summary-export`},QT=28,$T=6,eE=10,tE=new WeakMap,nE=e=>A(e.target,e=>e instanceof HTMLInputElement),rE=(e,t)=>{let n=e.getBoundingClientRect(),r=Number(e.value)/Math.max(1,Number(e.max));return Math.abs(t-(n.left+eE+(n.width-20)*r))<=QT},iE=(e,t)=>({down:e=>{D(nE(e),t=>{let n=e.pointerType===`touch`;tE.set(t,{x:e.clientX,y:e.clientY,accepted:!n||rE(t,e.clientX),decided:!n})})},move:e=>{D(k(E(tE.get(e.target??globalThis)),e=>!e.decided),t=>{let n=Math.abs(e.clientX-t.x),r=Math.abs(e.clientY-t.y);L(Math.max(n,r)>$T,()=>{tE.set(e.target??globalThis,{...t,decided:!0,accepted:t.accepted&&n>r})})})},end:e=>{tE.delete(e.target??globalThis)},input:n=>{let r=C(E(tE.get(n.target??globalThis)),{onNone:()=>!0,onSome:e=>e.accepted&&e.decided});L(r,()=>{t(n)}),L(!r,()=>{D(nE(n),t=>{Reflect.set(t,`value`,String(e))})})}}),aE=(e,t)=>I(e,t,()=>V),oE=(e,t,n,r)=>{let i=iE(t.minutes,n.slide);return B`
   <span class="sl">
     <input type="range" min="0" max=${t.max} step="1" .value=${ZT(String(t.minutes))} aria-label="Minutes for ${e}"
-      aria-valuetext=${t.valueWords} data-testid=${r.slider} @input=${n.slide}
-      @pointerdown=${n.grab} @pointerup=${n.release} @pointercancel=${n.release}>
+      aria-valuetext=${t.valueWords} data-testid=${r.slider} @input=${i.input} @pointermove=${i.move}
+      @pointerdown=${e=>{i.down(e),n.grab()}} @pointerup=${e=>{i.end(e),n.release()}}
+      @pointercancel=${e=>{i.end(e),n.release()}}>
     <input class="num sk2" .value=${ZT(t.typedText)} autocomplete="off" aria-label="Type time for ${e} (minutes or h:mm)"
       aria-invalid=${String(t.invalid)} aria-describedby=${r.errorId} data-testid=${r.typed} @input=${n.type}>
   </span>
-  <span id=${r.errorId} class="err" role="alert">${QT(t.invalid,()=>B`<span data-testid=${r.typedError}>Use minutes
+  <span id=${r.errorId} class="err" role="alert">${aE(t.invalid,()=>B`<span data-testid=${r.typedError}>Use minutes
     or h:mm, 0 to 24:00 — not applied</span>`)}</span>
-  <span class="meta" data-adjusted=${String(t.adjusted)} data-testid=${r.meta}>${t.metaText}</span>`,eE=(e,t)=>I(e,()=>B`<input class="chip-input" aria-label="New activity label" data-testid=${J.completeNewInput} placeholder="label name"
-    autocomplete="off" @change=${t.newLabel} @keydown=${t.newLabelKey}>`,()=>B`<button type="button" class="chip-btn dashed" data-testid=${J.completeNew} @click=${t.startNew}>+ new</button>`),tE=(e,t,n)=>B`
+  <span class="meta" data-adjusted=${String(t.adjusted)} data-testid=${r.meta}>${t.metaText}</span>`},sE=(e,t)=>I(e,()=>B`<input class="chip-input" aria-label="New activity label" data-testid=${J.completeNewInput} placeholder="label name"
+    autocomplete="off" @change=${t.newLabel} @keydown=${t.newLabelKey}>`,()=>B`<button type="button" class="chip-btn dashed" data-testid=${J.completeNew} @click=${t.startNew}>+ new</button>`),cE=(e,t,n)=>B`
   <h3 class="sub" id="complete-labels">Activity label <span class="meta">· optional</span></h3>
   <p class="chips" role="group" aria-labelledby="complete-labels">
     ${e.labels.map(e=>B`<button type="button" class="chip-btn" aria-pressed=${String(e.pressed)}
       data-testid=${J.completeChip(e.name)} @click=${n.pick(e.name)}>@${e.name}</button>`)}
-    ${eE(t,n)}
-  </p>`,nE={slider:J.completeSlider,typed:J.completeTyped,typedError:J.completeTypedError,meta:J.completeMeta,errorId:`complete-err`},rE=(e,t,n)=>B`
+    ${sE(t,n)}
+  </p>`,lE={slider:J.completeSlider,typed:J.completeTyped,typedError:J.completeTypedError,meta:J.completeMeta,errorId:`complete-err`},uE=(e,t,n)=>B`
   <h2 id="complete-title" class="head title" data-testid=${J.completeTitle}>${e.title}</h2>
   <section class="body" aria-label="Time, label and note">
     <p class="top"><span class="name">Time today</span>
       <span class="v" data-testid=${J.completeValue}>${e.field.valueText}</span></p>
-    ${$T(e.name,e.field,n.field,nE)}
-    ${tE(e,t,n)}
+    ${oE(e.name,e.field,n.field,lE)}
+    ${cE(e,t,n)}
     <label class="note"><span>Note <span class="meta">· optional</span></span>
       <input class="inp sk2" .value=${ZT(e.note)} autocomplete="off" data-testid=${J.completeNote} @input=${n.note}></label>
   </section>
   <footer class="foot">
     <button type="button" class="btn sk" data-testid=${J.completeCancel} @click=${n.cancel}>Cancel</button>
     <button type="button" class="btn sk2 primary" data-testid=${J.completeConfirm} @click=${n.confirm}>Complete</button>
-  </footer>`,iE={slide:e=>t=>({...t,minutes:x(e),typed:b()}),type:e=>t=>({...t,typed:x(e),minutes:Xn(lT(e),()=>t.minutes)}),pick:e=>t=>({...t,label:I(t.label===e,()=>``,()=>e)}),label:e=>t=>({...t,label:I(e.trim()===``,()=>t.label,()=>e.trim())}),note:e=>t=>({...t,note:e})},aE=(e,t)=>I(e,()=>[t],()=>[]),oE=(e,t,n,r)=>[...aE(!Object.values(e.catalog.labels).some(e=>e.name===t)&&!e.catalog.activityLabels.includes(t),{type:`catalog/labelCreated`,at:n,tempId:`tmp-${r}`,uuid:r,name:t}),...aE(!e.catalog.activityLabels.includes(t),{type:`catalog/activityLabelsSet`,at:n,names:[...e.catalog.activityLabels,t]})],sE=(e,t,n,r,i)=>{let a=t.trim();return I(a===``,()=>[],()=>[...oE(e,a,n,r),i(a)])},cE=(e,t,n,r)=>{let i=r(),a=r(),o=LT(e,t).field.minutes,s=e=>({type:`pages/taskCompleted`,at:n,pageId:t.pageId,taskId:t.taskId,uuid:i,labelUuid:a,minutes:o,label:e,note:t.note});return I(t.label===``,()=>[s(``)],()=>sE(e,t.label,n,r(),s))},lE=5,uE=(e,t)=>I(e,()=>Math.round(t/lE)*lE,()=>t),dE=e=>D(A(e.currentTarget,e=>e instanceof HTMLInputElement||e instanceof HTMLSelectElement),e=>e.value),fE=(e,t)=>{e.updateComplete.then(()=>{D(T(e.renderRoot.querySelector(t)),e=>{e.focus()})})},pE=(e,t)=>{let n=t=>{D(E(e.draft),n=>{e.draft=t(n)})},r=e=>t=>{D(dE(t),e)},i=()=>{e.renderRoot.querySelector(`dialog`)?.close()},a=()=>{e.adding=!1};return{field:{slide:r(t=>{n(iE.slide(uE(e.ctl.dragging,Number(t))))}),grab:()=>{e.ctl.dragging=!0},release:()=>{e.ctl.dragging=!1},type:r(e=>{n(iE.type(e))})},pick:e=>()=>{n(iE.pick(e))},startNew:()=>{e.adding=!0,fE(e,`[data-testid="${J.completeNewInput}"]`)},newLabel:r(t=>{n(iE.label(t)),a(),fE(e,`.chip-btn[aria-pressed="true"]`)}),newLabelKey:t=>{L(t.key===`Escape`,()=>{t.preventDefault(),t.stopPropagation(),a(),fE(e,`[data-testid="${J.completeNew}"]`)})},note:r(e=>{n(iE.note(e))}),cancel:i,confirm:()=>{D(E(e.draft),e=>{cE(t.store.getState(),e,t.now(),t.newId).forEach(e=>{t.store.dispatch(e)})}),e.ctl.opener=b(),i()}}},mE=e=>e instanceof Object&&`pageId`in e&&typeof e.pageId==`string`&&`taskId`in e&&typeof e.taskId==`string`,hE=(e,{pageId:t,taskId:n})=>{let r=bp(e.log.entries,t,n);return{pageId:t,taskId:n,minutes:b(),typed:b(),label:r.pipe(D(e=>e.label),k(e=>e!==``),w(()=>wp(e.catalog,n))),note:r.pipe(D(e=>e.note),w(()=>``))}},gE=e=>e instanceof HTMLElement,_E=e=>D(T(e.activeElement),e=>w(O(T(e.shadowRoot),_E),()=>e)),vE=()=>O(_E(document),A(gE)),yE=e=>{let t=t=>{A(t,e=>e instanceof CustomEvent).pipe(D(e=>e.detail),k(mE),O(t=>D(e.link.services(),e=>hE(e.store.getState(),t))),D(t=>{e.ctl.opener=vE(),e.adding=!1,e.draft=t,e.updateComplete.then(()=>{D(T(e.renderRoot.querySelector(`dialog`)),e=>{L(!e.open,()=>{e.showModal()})})})}))};return{connect:()=>{globalThis.addEventListener(`tt:complete`,t)},disconnect:()=>{globalThis.removeEventListener(`tt:complete`,t)}}},bE=e=>{let t=k(e,e=>e.isConnected);I(Yn(t),()=>{D(t,e=>{e.focus()})},()=>{globalThis.dispatchEvent(new CustomEvent(`tt:focus-list`))})},xE=e=>{e.draft=void 0,e.adding=!1;let t=e.ctl.opener;e.ctl.opener=b(),e.ctl.dragging=!1,bE(t)},SE=z`
+  </footer>`,dE={slide:e=>t=>({...t,minutes:x(e),typed:b()}),type:e=>t=>({...t,typed:x(e),minutes:Xn(lT(e),()=>t.minutes)}),pick:e=>t=>({...t,label:I(t.label===e,()=>``,()=>e)}),label:e=>t=>({...t,label:I(e.trim()===``,()=>t.label,()=>e.trim())}),note:e=>t=>({...t,note:e})},fE=(e,t)=>I(e,()=>[t],()=>[]),pE=(e,t,n,r)=>[...fE(!Object.values(e.catalog.labels).some(e=>e.name===t)&&!e.catalog.activityLabels.includes(t),{type:`catalog/labelCreated`,at:n,tempId:`tmp-${r}`,uuid:r,name:t}),...fE(!e.catalog.activityLabels.includes(t),{type:`catalog/activityLabelsSet`,at:n,names:[...e.catalog.activityLabels,t]})],mE=(e,t,n,r,i)=>{let a=t.trim();return I(a===``,()=>[],()=>[...pE(e,a,n,r),i(a)])},hE=(e,t,n,r)=>{let i=r(),a=r(),o=LT(e,t).field.minutes,s=e=>({type:`pages/taskCompleted`,at:n,pageId:t.pageId,taskId:t.taskId,uuid:i,labelUuid:a,minutes:o,label:e,note:t.note});return I(t.label===``,()=>[s(``)],()=>mE(e,t.label,n,r(),s))},gE=5,_E=(e,t)=>I(e,()=>Math.round(t/gE)*gE,()=>t),vE=e=>D(A(e.currentTarget,e=>e instanceof HTMLInputElement||e instanceof HTMLSelectElement),e=>e.value),yE=(e,t)=>{e.updateComplete.then(()=>{D(T(e.renderRoot.querySelector(t)),e=>{e.focus()})})},bE=(e,t)=>{let n=t=>{D(E(e.draft),n=>{e.draft=t(n)})},r=e=>t=>{D(vE(t),e)},i=()=>{e.renderRoot.querySelector(`dialog`)?.close()},a=()=>{e.adding=!1};return{field:{slide:r(t=>{n(dE.slide(_E(e.ctl.dragging,Number(t))))}),grab:()=>{e.ctl.dragging=!0},release:()=>{e.ctl.dragging=!1},type:r(e=>{n(dE.type(e))})},pick:e=>()=>{n(dE.pick(e))},startNew:()=>{e.adding=!0,yE(e,`[data-testid="${J.completeNewInput}"]`)},newLabel:r(t=>{n(dE.label(t)),a(),yE(e,`.chip-btn[aria-pressed="true"]`)}),newLabelKey:t=>{L(t.key===`Escape`,()=>{t.preventDefault(),t.stopPropagation(),a(),yE(e,`[data-testid="${J.completeNew}"]`)})},note:r(e=>{n(dE.note(e))}),cancel:i,confirm:()=>{D(E(e.draft),e=>{hE(t.store.getState(),e,t.now(),t.newId).forEach(e=>{t.store.dispatch(e)})}),e.ctl.opener=b(),i()}}},xE=e=>e instanceof Object&&`pageId`in e&&typeof e.pageId==`string`&&`taskId`in e&&typeof e.taskId==`string`,SE=(e,{pageId:t,taskId:n})=>{let r=bp(e.log.entries,t,n);return{pageId:t,taskId:n,minutes:b(),typed:b(),label:r.pipe(D(e=>e.label),k(e=>e!==``),w(()=>wp(e.catalog,n))),note:r.pipe(D(e=>e.note),w(()=>``))}},CE=e=>e instanceof HTMLElement,wE=e=>D(T(e.activeElement),e=>w(O(T(e.shadowRoot),wE),()=>e)),TE=()=>O(wE(document),A(CE)),EE=e=>{let t=t=>{A(t,e=>e instanceof CustomEvent).pipe(D(e=>e.detail),k(xE),O(t=>D(e.link.services(),e=>SE(e.store.getState(),t))),D(t=>{e.ctl.opener=TE(),e.adding=!1,e.draft=t,e.updateComplete.then(()=>{D(T(e.renderRoot.querySelector(`dialog`)),e=>{L(!e.open,()=>{e.showModal()})})})}))};return{connect:()=>{globalThis.addEventListener(`tt:complete`,t)},disconnect:()=>{globalThis.removeEventListener(`tt:complete`,t)}}},DE=e=>{let t=k(e,e=>e.isConnected);I(Yn(t),()=>{D(t,e=>{e.focus()})},()=>{globalThis.dispatchEvent(new CustomEvent(`tt:focus-list`))})},OE=e=>{e.draft=void 0,e.adding=!1;let t=e.ctl.opener;e.ctl.opener=b(),e.ctl.dragging=!1,DE(t)},kE=z`
   .sl { display: flex; align-items: center; gap: 8px; }
-  input[type='range'] { flex-grow: 1; min-inline-size: 0; block-size: 44px; margin: 0; accent-color: var(--focus); }
+  /* FS-6.3: a vertical swipe on a slider scrolls the list (the touch guard keeps the time). */
+  input[type='range'] { flex-grow: 1; min-inline-size: 0; block-size: 44px; margin: 0; accent-color: var(--focus); touch-action: pan-y; }
   .num { inline-size: 72px; block-size: 44px; box-sizing: border-box; padding: 0 6px; font: inherit; font-size: 17px; text-align: center; color: var(--ink); background: var(--card); }
   .num[aria-invalid='true'] { border-color: var(--warn); border-style: dashed; background: var(--warn-bg); }
   .err:empty { display: none; }
@@ -665,7 +668,7 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
   .err { color: var(--warn); }
   .meta[data-adjusted='true'] { color: var(--warn); }
   .v { font-family: var(--font-head); font-size: 24px; font-weight: 700; }
-`,CE=z`
+`,AE=z`
   dialog { inline-size: min(480px, calc(100vw - 16px)); block-size: fit-content; max-block-size: calc(100dvh - 16px); margin: auto; }
   .sheet { border: 2px solid var(--ink); border-radius: var(--r-b); box-shadow: var(--shadow); }
   .title { font-size: 26px; overflow-wrap: anywhere; }
@@ -687,8 +690,8 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
     .note { flex-direction: row; align-items: center; gap: 8px; }
     .note .inp { flex: 1; min-inline-size: 0; }
   }
-`,wE=class extends H{static{this.properties={draft:{state:!0},adding:{state:!0}}}static{this.styles=[U,iT,SE,CE]}constructor(){super(),this.link=W(this),this.ctl={opener:b(),dragging:!1},this.events=yE(this),this.draft=void 0,this.adding=!1}connectedCallback(){super.connectedCallback(),this.events.connect()}disconnectedCallback(){super.disconnectedCallback(),this.events.disconnect()}render(){let e=G(this.link)((e,t)=>C(E(this.draft),{onNone:()=>V,onSome:n=>rE(LT(e,n),this.adding,pE(this,t))}));return B`<dialog aria-labelledby="complete-title" data-testid=${J.complete} @close=${()=>{xE(this)}}>
-      <article class="sheet">${e}</article></dialog>`}};customElements.define(`tt-complete-dialog`,wE);var TE={coding:`var(--focus)`,meeting:`var(--break)`,review:`var(--p3)`,ops:`var(--ok)`},EE=[`var(--focus)`,`var(--break)`,`var(--ok)`,`var(--warn)`,`var(--p3)`,`var(--ink-soft)`],DE=e=>EE[Array.from({length:e.length},(t,n)=>e.charCodeAt(n)).reduce((e,t)=>e+t,0)%EE.length]??`var(--ink-soft)`,OE=e=>TE[e]??DE(e),kE=e=>I(e===``,()=>`no label`,()=>`@${e}`),AE=(e,t)=>t.minutes-e.minutes||e.label.localeCompare(t.label),jE=e=>{let t=Object.entries(Gr(e,e=>e.label)).map(([e,t])=>({label:e,minutes:t.reduce((e,t)=>e+OT(t),0),share:0})),n=Math.max(1,...t.map(e=>e.minutes));return t.map(e=>({...e,share:e.minutes/n})).sort(AE)},ME=(e,t)=>{let n=Object.values(e.log.entries).filter(e=>e.pageId===t).sort((e,t)=>t.endedAt-e.endedAt);return{totalMinutes:n.reduce((e,t)=>e+OT(t),0),byLabel:jE(n),entries:n.map(t=>({entry:t,title:IT(e.catalog,t.taskId)}))}},NE=(e,t)=>({...e,log:{...e.log,entries:Object.fromEntries(Object.entries(e.log.entries).filter(([e])=>e!==t))}}),PE=(e,t,n)=>{let r=ME(e,t.id);return{heading:`${I(t.date===n,()=>`Today`,()=>t.date)} ${AT(r.totalMinutes)}`,intervalsText:jT(e.timer.focusesDone[t.id]??0,`focus interval`),bars:r.byLabel.map(e=>({label:e.label,name:kE(e.label),text:AT(e.minutes),percent:`${String(Math.round(e.share*100))}%`,color:OE(e.label)})),rows:r.entries.map(({entry:e,title:t})=>({id:e.id,title:t,label:e.label,labelText:kE(e.label),minutes:OT(e),minutesText:AT(OT(e)),note:e.note})),labels:DT(e.catalog)}},FE=(e,t,n)=>u(E(e.pages.currentPageId),O(t=>E(e.pages.byId[t])),D(r=>PE(NE(e,n),r,t))),IE=z`
+`,jE=class extends H{static{this.properties={draft:{state:!0},adding:{state:!0}}}static{this.styles=[U,iT,kE,AE]}constructor(){super(),this.link=W(this),this.ctl={opener:b(),dragging:!1},this.events=EE(this),this.draft=void 0,this.adding=!1}connectedCallback(){super.connectedCallback(),this.events.connect()}disconnectedCallback(){super.disconnectedCallback(),this.events.disconnect()}render(){let e=G(this.link)((e,t)=>C(E(this.draft),{onNone:()=>V,onSome:n=>uE(LT(e,n),this.adding,bE(this,t))}));return B`<dialog aria-labelledby="complete-title" data-testid=${J.complete} @close=${()=>{OE(this)}}>
+      <article class="sheet">${e}</article></dialog>`}};customElements.define(`tt-complete-dialog`,jE);var ME={coding:`var(--focus)`,meeting:`var(--break)`,review:`var(--p3)`,ops:`var(--ok)`},NE=[`var(--focus)`,`var(--break)`,`var(--ok)`,`var(--warn)`,`var(--p3)`,`var(--ink-soft)`],PE=e=>NE[Array.from({length:e.length},(t,n)=>e.charCodeAt(n)).reduce((e,t)=>e+t,0)%NE.length]??`var(--ink-soft)`,FE=e=>ME[e]??PE(e),IE=e=>I(e===``,()=>`no label`,()=>`@${e}`),LE=(e,t)=>t.minutes-e.minutes||e.label.localeCompare(t.label),RE=e=>{let t=Object.entries(Gr(e,e=>e.label)).map(([e,t])=>({label:e,minutes:t.reduce((e,t)=>e+OT(t),0),share:0})),n=Math.max(1,...t.map(e=>e.minutes));return t.map(e=>({...e,share:e.minutes/n})).sort(LE)},zE=(e,t)=>{let n=Object.values(e.log.entries).filter(e=>e.pageId===t).sort((e,t)=>t.endedAt-e.endedAt);return{totalMinutes:n.reduce((e,t)=>e+OT(t),0),byLabel:RE(n),entries:n.map(t=>({entry:t,title:IT(e.catalog,t.taskId)}))}},BE=(e,t)=>({...e,log:{...e.log,entries:Object.fromEntries(Object.entries(e.log.entries).filter(([e])=>e!==t))}}),VE=(e,t,n)=>{let r=zE(e,t.id);return{heading:`${I(t.date===n,()=>`Today`,()=>t.date)} ${AT(r.totalMinutes)}`,intervalsText:jT(e.timer.focusesDone[t.id]??0,`focus interval`),bars:r.byLabel.map(e=>({label:e.label,name:IE(e.label),text:AT(e.minutes),percent:`${String(Math.round(e.share*100))}%`,color:FE(e.label)})),rows:r.entries.map(({entry:e,title:t})=>({id:e.id,title:t,label:e.label,labelText:IE(e.label),minutes:OT(e),minutesText:AT(OT(e)),note:e.note})),labels:DT(e.catalog)}},HE=(e,t,n)=>u(E(e.pages.currentPageId),O(t=>E(e.pages.byId[t])),D(r=>VE(BE(e,n),r,t))),UE=z`
   :host { display: block; }
   section { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
   .top { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
@@ -711,26 +714,26 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
   .edit-label { inline-size: auto; }
   .edit-note { flex: 1 1 140px; inline-size: auto; }
   .undo { margin: 0; min-block-size: 0; font-size: 17px; }
-`,LE=`important`,RE=` !`+LE,zE=zT(class extends BT{constructor(e){if(super(e),e.type!==RT.ATTRIBUTE||e.name!==`style`||e.strings?.length>2)throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.")}render(e){return Object.keys(e).reduce((t,n)=>{let r=e[n];return r==null?t:t+`${n=n.includes(`-`)?n:n.replace(/(?:^(webkit|moz|ms|o)|)(?=[A-Z])/g,`-$&`).toLowerCase()}:${r};`},``)}update(e,[t]){let{style:n}=e.element;if(this.ft===void 0)return this.ft=new Set(Object.keys(t)),this.render(t);for(let e of this.ft)t[e]??(this.ft.delete(e),e.includes(`-`)?n.removeProperty(e):n[e]=null);for(let e in t){let r=t[e];if(r!=null){this.ft.add(e);let t=typeof r==`string`&&r.endsWith(RE);e.includes(`-`)||t?n.setProperty(e,t?r.slice(0,-11):r,t?LE:``):n[e]=r}}return Wy}}),BE=B`<svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
-  stroke-linejoin="round" aria-hidden="true"><path d="M4 18l1-4L15 4l3 3L8 17zM13 6l3 3"></path></svg>`,VE=B`<svg width="22" height="22" viewBox="0 0 22 22" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
-  aria-hidden="true"><path d="M5 5.5c4 3.5 8 7.5 12 11.5M17 5c-3.5 4.5-8 8.5-12 12"></path></svg>`,HE=(e,t)=>B`
+`,WE=`important`,GE=` !`+WE,KE=zT(class extends BT{constructor(e){if(super(e),e.type!==RT.ATTRIBUTE||e.name!==`style`||e.strings?.length>2)throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.")}render(e){return Object.keys(e).reduce((t,n)=>{let r=e[n];return r==null?t:t+`${n=n.includes(`-`)?n:n.replace(/(?:^(webkit|moz|ms|o)|)(?=[A-Z])/g,`-$&`).toLowerCase()}:${r};`},``)}update(e,[t]){let{style:n}=e.element;if(this.ft===void 0)return this.ft=new Set(Object.keys(t)),this.render(t);for(let e of this.ft)t[e]??(this.ft.delete(e),e.includes(`-`)?n.removeProperty(e):n[e]=null);for(let e in t){let r=t[e];if(r!=null){this.ft.add(e);let t=typeof r==`string`&&r.endsWith(GE);e.includes(`-`)||t?n.setProperty(e,t?r.slice(0,-11):r,t?WE:``):n[e]=r}}return Wy}}),qE=B`<svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+  stroke-linejoin="round" aria-hidden="true"><path d="M4 18l1-4L15 4l3 3L8 17zM13 6l3 3"></path></svg>`,JE=B`<svg width="22" height="22" viewBox="0 0 22 22" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+  aria-hidden="true"><path d="M5 5.5c4 3.5 8 7.5 12 11.5M17 5c-3.5 4.5-8 8.5-12 12"></path></svg>`,YE=(e,t)=>B`
   <li class="entry" data-testid=${J.entry(e.id)}>
     <span class="what">${e.title}</span>
     <span class="chip" data-missing=${String(e.label===``)} data-testid=${J.entryLabel(e.id)}>${e.labelText}</span>
     <span class="amount">${e.minutesText}</span>
     <button type="button" class="ico" data-testid=${J.entryEdit(e.id)} aria-label="Edit entry: ${e.title}, ${e.minutesText}"
-      @click=${t.edit(e.id)}>${BE}</button>
+      @click=${t.edit(e.id)}>${qE}</button>
     <button type="button" class="ico" data-testid=${J.entryDelete(e.id)} aria-label="Delete entry: ${e.title}, ${e.minutesText}"
-      @click=${t.remove(e.id)}>${VE}</button>
+      @click=${t.remove(e.id)}>${JE}</button>
   </li>
-`,UE=(e,t,n)=>B`
+`,XE=(e,t,n)=>B`
   <li class="entry" data-testid=${J.entry(e.id)}>
     <form class="edit" aria-label="Edit entry: ${e.title}" @submit=${n.save(e.id)}>
       <label class="vh" for="edit-min">Minutes (45, 1:30 or 1h 30)</label>
       <input id="edit-min" name="minutes" class="inp sk2 edit-min" data-testid=${J.editMinutes} value=${e.minutes} autocomplete="off" required>
       <label class="vh" for="edit-label">Activity</label>
       <select id="edit-label" name="label" class="inp sk2 edit-label" data-testid=${J.editLabel}>
-        ${[...new Set([``,e.label,...t])].map(t=>B`<option value=${t} ?selected=${t===e.label}>${kE(t)}</option>`)}
+        ${[...new Set([``,e.label,...t])].map(t=>B`<option value=${t} ?selected=${t===e.label}>${IE(t)}</option>`)}
       </select>
       <label class="vh" for="edit-note">Note</label>
       <input id="edit-note" name="note" class="inp sk2 edit-note" data-testid=${J.editNote} value=${e.note} placeholder="note" autocomplete="off">
@@ -738,77 +741,77 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
       <button type="button" class="btn sk2" @click=${n.cancelEdit}>Cancel</button>
     </form>
   </li>
-`,WE=e=>B`
+`,ZE=e=>B`
   <ul class="bars" aria-label="Time by activity">
     ${e.bars.map(e=>B`<li class="bar" data-testid=${J.bar(e.label)}>
       <span class="name">${e.name}</span>
-      <span class="track" aria-hidden="true"><span class="fill" style=${zE({inlineSize:e.percent,background:e.color})}></span></span>
+      <span class="track" aria-hidden="true"><span class="fill" style=${KE({inlineSize:e.percent,background:e.color})}></span></span>
       <span class="amount">${e.text}</span></li>`)}
-  </ul>`,GE=(e,t,n)=>B`
+  </ul>`,QE=(e,t,n)=>B`
   <section class="sk card" data-testid=${J.summary} aria-labelledby="day-total">
     <header class="top">
       <h3 id="day-total" class="total" data-testid=${J.total}>${e.heading}</h3>
       <span class="muted" data-testid=${J.intervals}>${e.intervalsText}</span>
       <button type="button" class="btn sk2 export" data-testid=${J.exportCsv} @click=${n.exportCsv}>Export CSV</button>
     </header>
-    ${QT(e.bars.length>0,()=>WE(e))}
-    ${QT(e.rows.length>0,()=>B`<ol class="entries" aria-label="Time entries">
-      ${e.rows.map(r=>I(r.id===t.editing,()=>UE(r,e.labels,n),()=>HE(r,n)))}</ol>`)}
-    <p class="undo" role="status">${QT(t.pendingDelete!==void 0,()=>B`Entry deleted
+    ${aE(e.bars.length>0,()=>ZE(e))}
+    ${aE(e.rows.length>0,()=>B`<ol class="entries" aria-label="Time entries">
+      ${e.rows.map(r=>I(r.id===t.editing,()=>XE(r,e.labels,n),()=>YE(r,n)))}</ol>`)}
+    <p class="undo" role="status">${aE(t.pendingDelete!==void 0,()=>B`Entry deleted
       <button type="button" class="link" data-testid=${J.undo} @click=${n.undo}>Undo</button>`)}</p>
   </section>
-`,KE=/^[=+\-@\t\r]/,qE=/[",\r\n]/,JE=e=>I(KE.test(e),()=>`'${e}`,()=>e),YE=e=>{let t=JE(e);return I(qE.test(t),()=>`"${t.replaceAll(`"`,`""`)}"`,()=>t)},XE=e=>String(e).padStart(2,`0`),ZE=e=>{let t=new Date(e);return{date:`${String(t.getFullYear())}-${XE(t.getMonth()+1)}-${XE(t.getDate())}`,time:`${XE(t.getHours())}:${XE(t.getMinutes())}`}},QE=`date,start,end,minutes,label,task,project,note`,$E=`\r
-`,eD=e=>t=>{let n=e.tasks[t.taskId],r=ZE(t.startedAt);return[r.date,r.time,ZE(t.endedAt).time,String(OT(t)),t.label,n?.content??``,e.projects[n?.projectId??``]?.name??``,t.note].map(YE).join(`,`)},tD=(e,t)=>[QE,...[...e].sort((e,t)=>e.startedAt-t.startedAt).map(eD(t))].map(e=>e+$E).join(``),nD=e=>{globalThis.clearTimeout(e.ctl.timer),e.ctl.timer=void 0,D(E(e.pendingDelete),t=>{D(e.link.services(),e=>{e.store.dispatch({type:`log/entryDeleted`,at:e.now(),entryId:t})})}),e.pendingDelete=void 0},rD=5e3,iD=e=>{e.updateComplete.then(()=>{D(T(e.renderRoot.querySelector(`[data-testid="${J.undo}"]`)),e=>{e.focus()})})},aD=e=>({remove:t=>()=>{nD(e),e.pendingDelete=t,e.ctl.timer=globalThis.setTimeout(()=>{nD(e)},rD),iD(e)},undo:()=>{globalThis.clearTimeout(e.ctl.timer),e.ctl.timer=void 0,e.pendingDelete=void 0}}),oD=(e,t,n)=>{let r=URL.createObjectURL(new Blob([n],{type:t}));Object.assign(document.createElement(`a`),{href:r,download:e}).click(),globalThis.setTimeout(()=>{URL.revokeObjectURL(r)},0)},sD=(e,t)=>w(A(e.get(t),e=>typeof e==`string`),()=>``),cD=e=>{D(T(e.querySelector(`input[name="minutes"]`)),e=>{e.setCustomValidity(`Use minutes like 45, 1:30 or 1h 30 (up to 24 h)`),e.reportValidity(),e.addEventListener(`input`,()=>{e.setCustomValidity(``)},{once:!0})})},lD=(e,t)=>({edit:t=>()=>{e.editing=t},cancelEdit:()=>{e.editing=void 0},save:n=>r=>{r.preventDefault(),D(A(r.currentTarget,e=>e instanceof HTMLFormElement),r=>{let i=new FormData(r);C(u(sT(sD(i,`minutes`)),k(e=>e<=1440)),{onNone:()=>{cD(r)},onSome:r=>{t.store.dispatch({type:`log/entryEdited`,at:t.now(),entryId:n,minutes:r,label:sD(i,`label`),note:sD(i,`note`).trim()}),e.editing=void 0}})})}}),uD=(e,t)=>({...lD(e,t),...aD(e),exportCsv:()=>{let e=t.store.getState();oD(`time-log-${t.today(t.now())}.csv`,`text/csv;charset=utf-8`,tD(Object.values(e.log.entries),e.catalog))}}),dD=class extends H{static{this.properties={editing:{state:!0},pendingDelete:{state:!0}}}static{this.styles=[U,IE]}constructor(){super(),this.link=W(this),this.ctl={timer:void 0},this.editing=void 0,this.pendingDelete=void 0}disconnectedCallback(){super.disconnectedCallback(),nD(this)}render(){return G(this.link)((e,t)=>C(FE(e,t.today(e.now),this.pendingDelete),{onNone:()=>V,onSome:e=>GE(e,this,uD(this,t))}))}};customElements.define(`tt-day-summary`,dD);var fD=(e,t)=>e.key.toLowerCase()===`n`&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!t,pD=new Set([`INPUT`,`TEXTAREA`,`SELECT`]),mD=e=>pD.has(e.tagName)||e.isContentEditable,hD=e=>{e.renderRoot.querySelectorAll(`input`).forEach(e=>{e.focus()})},gD=e=>{globalThis.dispatchEvent(new CustomEvent(wS)),globalThis.requestAnimationFrame(()=>{hD(e)})},_D=e=>e.composedPath().slice(0,1).some(e=>e instanceof HTMLElement&&mD(e)),vD=e=>{let t={current:void 0},n=t=>{L(!t.defaultPrevented&&fD(t,_D(t)),()=>{t.preventDefault(),gD(e)})},r=()=>{gD(e)};return{toast:t,swipe:{current:void 0},connect:()=>{globalThis.addEventListener(`keydown`,n),globalThis.addEventListener(`tt:focus-capture`,r)},disconnect:()=>{globalThis.removeEventListener(`keydown`,n),globalThis.removeEventListener(`tt:focus-capture`,r),globalThis.clearTimeout(t.current)}}},yD={backlog:`Sent to Inbox`,next:`Added to Next up`,close:`Closed`},bD=(e,t)=>`${yD[e]}: “${t}”`,xD=5e3,SD=(e,t)=>{globalThis.clearTimeout(e.ctl.toast.current),e.toast=t,e.ctl.toast.current=globalThis.setTimeout(()=>{e.toast=void 0},xD)},CD=(e,t,n)=>(r,i)=>{t.store.dispatch({type:`capture/triaged`,at:t.now(),pageId:n,itemId:r.id,decision:i,taskTempId:`tmp-${t.newId()}`,uuid:t.newId()}),e.openFor=void 0,e.drag=void 0,SD(e,{text:bD(i,r.text),pageId:n})},wD=80,TD=[[`next`,e=>e>=wD],[`backlog`,e=>e<=-80]],ED=e=>T(TD.find(([,t])=>t(e))).pipe(D(([e])=>e)),DD=8,OD=e=>{[e.currentTarget].filter(e=>e instanceof Element).filter(t=>!t.hasPointerCapture(e.pointerId)).forEach(t=>{t.setPointerCapture(e.pointerId)})},kD=(e,t)=>{let n=()=>{e.ctl.swipe.current=void 0,e.drag=void 0};return{down:t=>n=>{L(n.isPrimary&&n.button===0,()=>{e.ctl.swipe.current={id:t,x0:n.clientX,pointerId:n.pointerId}})},move:t=>{T(e.ctl.swipe.current).pipe(k(e=>e.pointerId===t.pointerId),D(e=>({id:e.id,dx:t.clientX-e.x0})),k(e=>Math.abs(e.dx)>DD),D(n=>{OD(t),e.drag=n}))},up:r=>()=>{let i=T(e.drag).pipe(k(e=>e.id===r.id),D(e=>e.dx),w(()=>0));n(),D(ED(i),e=>{t(r,e)})},cancel:n}},AD=(e,t,n)=>{let r=CD(e,t,n);return{submit:r=>{r.preventDefault(),e.renderRoot.querySelectorAll(`form`).forEach(e=>{let r=Array.from(e.querySelectorAll(`input`),e=>e.value).join(``);L(r.trim().length>0,()=>{t.store.dispatch({type:`capture/added`,at:t.now(),pageId:n,id:t.newId(),text:r})}),e.reset()})},triage:(t,n)=>i=>{r(t,n),L(i.detail===0,()=>{hD(e)})},toggleMore:t=>{e.openFor=Zn(A(t,t=>t!==e.openFor))},undo:()=>{D(T(e.toast),e=>{t.store.dispatch({type:`capture/undone`,at:t.now(),pageId:e.pageId})}),SD(e,void 0)},swipe:kD(e,r)}},jD={column:`capture-column`,count:`capture-count`,input:`capture-input`,item:`capture-item`,itemText:`capture-item-text`,more:`capture-more`,banner:`capture-banner`,done:`capture-done`,toast:`capture-toast`,undo:`capture-undo`,noPage:`capture-no-page`,readOnly:`capture-read-only`},MD=e=>B`
+`,$E=/^[=+\-@\t\r]/,eD=/[",\r\n]/,tD=e=>I($E.test(e),()=>`'${e}`,()=>e),nD=e=>{let t=tD(e);return I(eD.test(t),()=>`"${t.replaceAll(`"`,`""`)}"`,()=>t)},rD=e=>String(e).padStart(2,`0`),iD=e=>{let t=new Date(e);return{date:`${String(t.getFullYear())}-${rD(t.getMonth()+1)}-${rD(t.getDate())}`,time:`${rD(t.getHours())}:${rD(t.getMinutes())}`}},aD=`date,start,end,minutes,label,task,project,note`,oD=`\r
+`,sD=e=>t=>{let n=e.tasks[t.taskId],r=iD(t.startedAt);return[r.date,r.time,iD(t.endedAt).time,String(OT(t)),t.label,n?.content??``,e.projects[n?.projectId??``]?.name??``,t.note].map(nD).join(`,`)},cD=(e,t)=>[aD,...[...e].sort((e,t)=>e.startedAt-t.startedAt).map(sD(t))].map(e=>e+oD).join(``),lD=e=>{globalThis.clearTimeout(e.ctl.timer),e.ctl.timer=void 0,D(E(e.pendingDelete),t=>{D(e.link.services(),e=>{e.store.dispatch({type:`log/entryDeleted`,at:e.now(),entryId:t})})}),e.pendingDelete=void 0},uD=5e3,dD=e=>{e.updateComplete.then(()=>{D(T(e.renderRoot.querySelector(`[data-testid="${J.undo}"]`)),e=>{e.focus()})})},fD=e=>({remove:t=>()=>{lD(e),e.pendingDelete=t,e.ctl.timer=globalThis.setTimeout(()=>{lD(e)},uD),dD(e)},undo:()=>{globalThis.clearTimeout(e.ctl.timer),e.ctl.timer=void 0,e.pendingDelete=void 0}}),pD=(e,t,n)=>{let r=URL.createObjectURL(new Blob([n],{type:t}));Object.assign(document.createElement(`a`),{href:r,download:e}).click(),globalThis.setTimeout(()=>{URL.revokeObjectURL(r)},0)},mD=(e,t)=>w(A(e.get(t),e=>typeof e==`string`),()=>``),hD=e=>{D(T(e.querySelector(`input[name="minutes"]`)),e=>{e.setCustomValidity(`Use minutes like 45, 1:30 or 1h 30 (up to 24 h)`),e.reportValidity(),e.addEventListener(`input`,()=>{e.setCustomValidity(``)},{once:!0})})},gD=(e,t)=>({edit:t=>()=>{e.editing=t},cancelEdit:()=>{e.editing=void 0},save:n=>r=>{r.preventDefault(),D(A(r.currentTarget,e=>e instanceof HTMLFormElement),r=>{let i=new FormData(r);C(u(sT(mD(i,`minutes`)),k(e=>e<=1440)),{onNone:()=>{hD(r)},onSome:r=>{t.store.dispatch({type:`log/entryEdited`,at:t.now(),entryId:n,minutes:r,label:mD(i,`label`),note:mD(i,`note`).trim()}),e.editing=void 0}})})}}),_D=(e,t)=>({...gD(e,t),...fD(e),exportCsv:()=>{let e=t.store.getState();pD(`time-log-${t.today(t.now())}.csv`,`text/csv;charset=utf-8`,cD(Object.values(e.log.entries),e.catalog))}}),vD=class extends H{static{this.properties={editing:{state:!0},pendingDelete:{state:!0}}}static{this.styles=[U,UE]}constructor(){super(),this.link=W(this),this.ctl={timer:void 0},this.editing=void 0,this.pendingDelete=void 0}disconnectedCallback(){super.disconnectedCallback(),lD(this)}render(){return G(this.link)((e,t)=>C(HE(e,t.today(e.now),this.pendingDelete),{onNone:()=>V,onSome:e=>QE(e,this,_D(this,t))}))}};customElements.define(`tt-day-summary`,vD);var yD=(e,t)=>e.key.toLowerCase()===`n`&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!t,bD=new Set([`INPUT`,`TEXTAREA`,`SELECT`]),xD=e=>bD.has(e.tagName)||e.isContentEditable,SD=e=>{e.renderRoot.querySelectorAll(`input`).forEach(e=>{e.focus()})},CD=e=>{globalThis.dispatchEvent(new CustomEvent(wS)),globalThis.requestAnimationFrame(()=>{SD(e)})},wD=e=>e.composedPath().slice(0,1).some(e=>e instanceof HTMLElement&&xD(e)),TD=e=>{let t={current:void 0},n=t=>{L(!t.defaultPrevented&&yD(t,wD(t)),()=>{t.preventDefault(),CD(e)})},r=()=>{CD(e)};return{toast:t,swipe:{current:void 0},connect:()=>{globalThis.addEventListener(`keydown`,n),globalThis.addEventListener(`tt:focus-capture`,r)},disconnect:()=>{globalThis.removeEventListener(`keydown`,n),globalThis.removeEventListener(`tt:focus-capture`,r),globalThis.clearTimeout(t.current)}}},ED={backlog:`Sent to Inbox`,next:`Added to Next up`,close:`Closed`},DD=(e,t)=>`${ED[e]}: “${t}”`,OD=5e3,kD=(e,t)=>{globalThis.clearTimeout(e.ctl.toast.current),e.toast=t,e.ctl.toast.current=globalThis.setTimeout(()=>{e.toast=void 0},OD)},AD=(e,t,n)=>(r,i)=>{t.store.dispatch({type:`capture/triaged`,at:t.now(),pageId:n,itemId:r.id,decision:i,taskTempId:`tmp-${t.newId()}`,uuid:t.newId()}),e.openFor=void 0,e.drag=void 0,kD(e,{text:DD(i,r.text),pageId:n})},jD=80,MD=[[`next`,e=>e>=jD],[`backlog`,e=>e<=-80]],ND=e=>T(MD.find(([,t])=>t(e))).pipe(D(([e])=>e)),PD=8,FD=e=>{[e.currentTarget].filter(e=>e instanceof Element).filter(t=>!t.hasPointerCapture(e.pointerId)).forEach(t=>{t.setPointerCapture(e.pointerId)})},ID=(e,t)=>{let n=()=>{e.ctl.swipe.current=void 0,e.drag=void 0};return{down:t=>n=>{L(n.isPrimary&&n.button===0,()=>{e.ctl.swipe.current={id:t,x0:n.clientX,pointerId:n.pointerId}})},move:t=>{T(e.ctl.swipe.current).pipe(k(e=>e.pointerId===t.pointerId),D(e=>({id:e.id,dx:t.clientX-e.x0})),k(e=>Math.abs(e.dx)>PD),D(n=>{FD(t),e.drag=n}))},up:r=>()=>{let i=T(e.drag).pipe(k(e=>e.id===r.id),D(e=>e.dx),w(()=>0));n(),D(ND(i),e=>{t(r,e)})},cancel:n}},LD=(e,t,n)=>{let r=AD(e,t,n);return{submit:r=>{r.preventDefault(),e.renderRoot.querySelectorAll(`form`).forEach(e=>{let r=Array.from(e.querySelectorAll(`input`),e=>e.value).join(``);L(r.trim().length>0,()=>{t.store.dispatch({type:`capture/added`,at:t.now(),pageId:n,id:t.newId(),text:r})}),e.reset()})},triage:(t,n)=>i=>{r(t,n),L(i.detail===0,()=>{SD(e)})},toggleMore:t=>{e.openFor=Zn(A(t,t=>t!==e.openFor))},undo:()=>{D(T(e.toast),e=>{t.store.dispatch({type:`capture/undone`,at:t.now(),pageId:e.pageId})}),kD(e,void 0)},swipe:ID(e,r)}},RD={column:`capture-column`,count:`capture-count`,input:`capture-input`,item:`capture-item`,itemText:`capture-item-text`,more:`capture-more`,banner:`capture-banner`,done:`capture-done`,toast:`capture-toast`,undo:`capture-undo`,noPage:`capture-no-page`,readOnly:`capture-read-only`},zD=e=>B`
   <form class="add" @submit=${e}>
     <label class="vh" for="capture-input">Add a raw to-do</label>
-    <input id="capture-input" name="text" class="inp sk2" data-testid=${jD.input} autocomplete="off" enterkeyhint="enter"
+    <input id="capture-input" name="text" class="inp sk2" data-testid=${RD.input} autocomplete="off" enterkeyhint="enter"
       aria-keyshortcuts="N" placeholder="Jot it down and keep focusing… (Enter)">
   </form>
-`,ND=new Map([[1,`Next →`],[-1,`← Backlog`]]),PD=e=>ND.get(Math.sign(e))??``,FD=[{decision:`backlog`,label:`Backlog`,shape:`sk2`},{decision:`next`,label:`Next`,shape:`sk next`},{decision:`close`,label:`Close`,shape:`sk2`}],ID=(e,t)=>B`
+`,BD=new Map([[1,`Next →`],[-1,`← Backlog`]]),VD=e=>BD.get(Math.sign(e))??``,HD=[{decision:`backlog`,label:`Backlog`,shape:`sk2`},{decision:`next`,label:`Next`,shape:`sk next`},{decision:`close`,label:`Close`,shape:`sk2`}],UD=(e,t)=>B`
   <span class="acts" role="group" aria-label=${`Sort “${e.text}”`}>
-    ${FD.map(n=>B`
+    ${HD.map(n=>B`
       <button type="button" class=${`btn act ${n.shape}`} @click=${t.triage(e,n.decision)}>
         ${n.label}<span class="vh"> “${e.text}”</span>
       </button>`)}
   </span>
-`,LD=(e,t,n)=>B`
-  <button type="button" class="ico more" data-testid=${jD.more} aria-expanded=${String(t)}
+`,WD=(e,t,n)=>B`
+  <button type="button" class="ico more" data-testid=${RD.more} aria-expanded=${String(t)}
     aria-label=${`More actions for “${e.text}”`} @click=${()=>{n.toggleMore(e.id)}}>⋯</button>
-  ${I(t,()=>ID(e,n),()=>V)}
-`,RD=(e,t,n,r)=>I(t,()=>ID(e,r),()=>LD(e,n,r)),zD=(e,t,n,r,i)=>{let a=T(r).pipe(k(t=>t.id===e.id),D(e=>e.dx),w(()=>0));return B`
-    <li class="item" data-testid=${jD.item}>
-      <span class="hint" data-side=${String(Math.sign(a))} aria-hidden="true">${PD(a)}</span>
+  ${I(t,()=>UD(e,n),()=>V)}
+`,GD=(e,t,n,r)=>I(t,()=>UD(e,r),()=>WD(e,n,r)),KD=(e,t,n,r,i)=>{let a=T(r).pipe(k(t=>t.id===e.id),D(e=>e.dx),w(()=>0));return B`
+    <li class="item" data-testid=${RD.item}>
+      <span class="hint" data-side=${String(Math.sign(a))} aria-hidden="true">${VD(a)}</span>
       <article class="card sk" data-dragging=${String(a!==0)} style=${`transform: translateX(${String(a)}px)`}
         @pointerdown=${i.swipe.down(e.id)} @pointermove=${i.swipe.move} @pointerup=${i.swipe.up(e)} @pointercancel=${i.swipe.cancel}>
-        <span class="text" data-testid=${jD.itemText}>${e.text}</span>
-        ${RD(e,t,n===e.id,i)}
+        <span class="text" data-testid=${RD.itemText}>${e.text}</span>
+        ${GD(e,t,n===e.id,i)}
       </article>
-    </li>`},BD=e=>I(e.inBreak&&!e.readOnly,()=>B`
-  <p class="banner sk2" data-testid=${jD.banner}>Break time. Sort every item: <b>Backlog</b> goes to the Inbox,
-    <b>Next</b> joins the queue, <b>Close</b> drops it. Swipe right for Next, left for Backlog.</p>`,()=>V),VD=(e,t)=>I(e.readOnly,()=>B`<p class="muted note" data-testid=${jD.readOnly}>This page is closed — its capture list is read-only.</p>`,()=>MD(t.submit)),HD=e=>B`
-  <li class="item" data-testid=${jD.item}><article class="card sk"><span class="text" data-testid=${jD.itemText}>${e}</span></article></li>`,UD=e=>I(e.done,()=>B`<p class="done head" data-testid=${jD.done}>All clear — enjoy the rest of the break ✓</p>`,()=>V),WD=(e,t,n,r)=>B`
-  ${BD(e)}
-  ${VD(e,r)}
+    </li>`},qD=e=>I(e.inBreak&&!e.readOnly,()=>B`
+  <p class="banner sk2" data-testid=${RD.banner}>Break time. Sort every item: <b>Backlog</b> goes to the Inbox,
+    <b>Next</b> joins the queue, <b>Close</b> drops it. Swipe right for Next, left for Backlog.</p>`,()=>V),JD=(e,t)=>I(e.readOnly,()=>B`<p class="muted note" data-testid=${RD.readOnly}>This page is closed — its capture list is read-only.</p>`,()=>zD(t.submit)),YD=e=>B`
+  <li class="item" data-testid=${RD.item}><article class="card sk"><span class="text" data-testid=${RD.itemText}>${e}</span></article></li>`,XD=e=>I(e.done,()=>B`<p class="done head" data-testid=${RD.done}>All clear — enjoy the rest of the break ✓</p>`,()=>V),ZD=(e,t,n,r)=>B`
+  ${qD(e)}
+  ${JD(e,r)}
   <ul class="items" aria-label="Raw to-dos">
-    ${e.items.map(i=>I(e.readOnly,()=>HD(i.text),()=>zD(i,e.inBreak,t,n,r)))}
+    ${e.items.map(i=>I(e.readOnly,()=>YD(i.text),()=>KD(i,e.inBreak,t,n,r)))}
   </ul>
-  ${UD(e)}
-`,GD=(e,t)=>B`
-  <p class="toast muted" role="status">${T(e).pipe(C({onNone:()=>V,onSome:e=>B`<span data-testid=${jD.toast}>${e.text} ·
-      <button type="button" class="link" data-testid=${jD.undo} @click=${t}>undo</button></span>`}))}</p>
-`,KD=(e,t,n)=>C(e,{onNone:()=>B`
-    <section class="column" data-testid=${jD.column} aria-labelledby="capture-title">
+  ${XD(e)}
+`,QD=(e,t)=>B`
+  <p class="toast muted" role="status">${T(e).pipe(C({onNone:()=>V,onSome:e=>B`<span data-testid=${RD.toast}>${e.text} ·
+      <button type="button" class="link" data-testid=${RD.undo} @click=${t}>undo</button></span>`}))}</p>
+`,$D=(e,t,n)=>C(e,{onNone:()=>B`
+    <section class="column" data-testid=${RD.column} aria-labelledby="capture-title">
       <header class="top"><h2 id="capture-title" class="head title">Capture</h2></header>
-      <p class="muted note" data-testid=${jD.noPage}>Start today’s page to jot down raw to-dos.</p>
+      <p class="muted note" data-testid=${RD.noPage}>Start today’s page to jot down raw to-dos.</p>
     </section>`,onSome:e=>{let r=n(e.pageId);return B`
-      <section class="column" data-testid=${jD.column} data-highlighted=${String(e.highlighted)} aria-labelledby="capture-title">
+      <section class="column" data-testid=${RD.column} data-highlighted=${String(e.highlighted)} aria-labelledby="capture-title">
         <header class="top">
           <h2 id="capture-title" class="head title">Capture</h2>
-          <span class="muted count" data-testid=${jD.count}>${e.countLabel}</span>
+          <span class="muted count" data-testid=${RD.count}>${e.countLabel}</span>
         </header>
-        ${WD(e,t.openFor,t.drag,r)}
-        ${GD(t.toast,r.undo)}
-      </section>`}}),qD=z`
+        ${ZD(e,t.openFor,t.drag,r)}
+        ${QD(t.toast,r.undo)}
+      </section>`}}),eO=z`
   :host { display: block; }
   .column { display: flex; flex-direction: column; gap: 12px; padding: 12px; margin: -12px; border-radius: 18px 6px 18px 6px;
     background: transparent; transition: background-color .2s; }
@@ -851,7 +854,7 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
     .acts { flex: none; flex-wrap: nowrap; }
     .act { flex: none; min-width: 64px; justify-content: center; font-size: 15px; padding: 2px 8px; }
   }
-`,JD=class extends H{constructor(...e){super(...e),this.ctl=vD(this),this.link=W(this)}static{this.properties={openFor:{state:!0},drag:{state:!0},toast:{state:!0}}}static{this.styles=[U,qD]}connectedCallback(){super.connectedCallback(),this.ctl.connect()}disconnectedCallback(){super.disconnectedCallback(),this.ctl.disconnect()}render(){return G(this.link)((e,t)=>KD(yS(e,t.today(e.now)),{openFor:this.openFor,drag:this.drag,toast:this.toast},e=>AD(this,t,e)))}};customElements.define(`tt-capture-column`,JD);var YD=z`
+`,tO=class extends H{constructor(...e){super(...e),this.ctl=TD(this),this.link=W(this)}static{this.properties={openFor:{state:!0},drag:{state:!0},toast:{state:!0}}}static{this.styles=[U,eO]}connectedCallback(){super.connectedCallback(),this.ctl.connect()}disconnectedCallback(){super.disconnectedCallback(),this.ctl.disconnect()}render(){return G(this.link)((e,t)=>$D(yS(e,t.today(e.now)),{openFor:this.openFor,drag:this.drag,toast:this.toast},e=>LD(this,t,e)))}};customElements.define(`tt-capture-column`,tO);var nO=z`
   :host { display: flex; align-items: flex-start; gap: 4px; }
   .note { font: inherit; font-size: 18px; line-height: 1.35; color: var(--ink); background: transparent; border: 0;
     resize: vertical; width: 100%; min-height: 96px; padding: 2px; field-sizing: content; }
@@ -859,11 +862,11 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
   .read { flex: 1; margin: 0; min-height: 44px; font-size: 18px; line-height: 1.35; white-space: pre-wrap;
     overflow-wrap: anywhere; }
   .read a { color: var(--break); }
-`,Y={column:`notes-column`,addText:`notes-add-text`,addSketch:`notes-add-sketch`,sticker:`sticker`,text:`sticker-text`,read:`sticker-read`,editMode:`sticker-edit-mode`,sketch:`sketch-svg`,stroke:`sketch-stroke`,pen:`sketch-pen`,eraser:`sketch-eraser`,ink:e=>`sketch-ink-${e}`,undo:`sketch-undo`,redo:`sketch-redo`,clear:`sketch-clear`,alt:`sketch-alt`,menu:`sticker-menu`,color:e=>`sticker-color-${e}`,moveUp:`sticker-move-up`,moveDown:`sticker-move-down`,expand:`sticker-expand`,remove:`sticker-delete`,toast:`notes-toast`,restore:`notes-undo-delete`,dialog:`notes-dialog`,closeDialog:`notes-dialog-close`},XD=(e,t)=>{C(T(e.querySelector(`[data-testid="${t}"]`)),{onNone:()=>void 0,onSome:e=>{e.focus()}})},ZD=300,QD=e=>{let t=e.ctl.pending!==void 0;globalThis.clearTimeout(e.ctl.pending),e.ctl.pending=void 0,L(t&&e.draft!==e.sticker.text,()=>{e.send(e.sticker.id,{type:`notes/textChanged`,text:e.draft})})},$D=e=>{e.draft=e.sticker.text,e.updateComplete.then(()=>{XD(e.renderRoot,Y.text)})},eO={input:(e,t)=>{e.draft=t,globalThis.clearTimeout(e.ctl.pending),e.ctl.pending=globalThis.setTimeout(()=>{QD(e)},ZD)},flush:QD,modeChanged:(e,t)=>{L(t,()=>{I(e.editing,()=>{$D(e)},()=>{QD(e)})})}},tO=/(https?:\/\/[^\s<>"]*[^\s<>".,;:!?)\]'])/,nO=e=>e.split(tO).map((e,t)=>({kind:I(t%2==1,()=>`link`,()=>`text`),value:e})).filter(e=>e.value!==``),rO=e=>e instanceof HTMLInputElement||e instanceof HTMLTextAreaElement,iO=e=>w(D(A(e.target,rO),e=>e.value),()=>``),aO=e=>{switch(e.kind){case`text`:return e.value;case`link`:return B`<a href=${e.value} target="_blank" rel="noopener noreferrer">${e.value}</a>`}},oO=e=>B`
+`,Y={column:`notes-column`,addText:`notes-add-text`,addSketch:`notes-add-sketch`,sticker:`sticker`,text:`sticker-text`,read:`sticker-read`,editMode:`sticker-edit-mode`,sketch:`sketch-svg`,stroke:`sketch-stroke`,pen:`sketch-pen`,eraser:`sketch-eraser`,ink:e=>`sketch-ink-${e}`,undo:`sketch-undo`,redo:`sketch-redo`,clear:`sketch-clear`,alt:`sketch-alt`,menu:`sticker-menu`,color:e=>`sticker-color-${e}`,moveUp:`sticker-move-up`,moveDown:`sticker-move-down`,expand:`sticker-expand`,remove:`sticker-delete`,toast:`notes-toast`,restore:`notes-undo-delete`,dialog:`notes-dialog`,closeDialog:`notes-dialog-close`},rO=(e,t)=>{C(T(e.querySelector(`[data-testid="${t}"]`)),{onNone:()=>void 0,onSome:e=>{e.focus()}})},iO=300,aO=e=>{let t=e.ctl.pending!==void 0;globalThis.clearTimeout(e.ctl.pending),e.ctl.pending=void 0,L(t&&e.draft!==e.sticker.text,()=>{e.send(e.sticker.id,{type:`notes/textChanged`,text:e.draft})})},oO=e=>{e.draft=e.sticker.text,e.updateComplete.then(()=>{rO(e.renderRoot,Y.text)})},sO={input:(e,t)=>{e.draft=t,globalThis.clearTimeout(e.ctl.pending),e.ctl.pending=globalThis.setTimeout(()=>{aO(e)},iO)},flush:aO,modeChanged:(e,t)=>{L(t,()=>{I(e.editing,()=>{oO(e)},()=>{aO(e)})})}},cO=/(https?:\/\/[^\s<>"]*[^\s<>".,;:!?)\]'])/,lO=e=>e.split(cO).map((e,t)=>({kind:I(t%2==1,()=>`link`,()=>`text`),value:e})).filter(e=>e.value!==``),uO=e=>e instanceof HTMLInputElement||e instanceof HTMLTextAreaElement,dO=e=>w(D(A(e.target,uO),e=>e.value),()=>``),fO=e=>{switch(e.kind){case`text`:return e.value;case`link`:return B`<a href=${e.value} target="_blank" rel="noopener noreferrer">${e.value}</a>`}},pO=e=>B`
   <label class="vh" for="t">Sticker text</label>
   <textarea id="t" class="note" data-testid=${Y.text} .value=${e.draft} placeholder="Write a note…"
-    @input=${t=>{eO.input(e,iO(t))}}
-    @blur=${()=>{eO.flush(e)}}></textarea>`,sO=e=>I(e===``,()=>B`<span class="muted">Empty note — press edit to write.</span>`,()=>B`${nO(e).map(aO)}`),cO=e=>I(e.editing,()=>oO(e),()=>B`<p class="read" data-testid=${Y.read}>${sO(e.sticker.text)}</p>`),lO=class extends H{static{this.properties={sticker:{attribute:!1},send:{attribute:!1},editing:{type:Boolean},draft:{state:!0}}}static{this.styles=[U,YD]}constructor(){super(),this.ctl={pending:void 0},this.editing=!1,this.draft=``}disconnectedCallback(){eO.flush(this),super.disconnectedCallback()}willUpdate(e){eO.modeChanged(this,e.has(`editing`))}render(){return cO(this)}};customElements.define(`tt-text-note`,lO);var uO=z`
+    @input=${t=>{sO.input(e,dO(t))}}
+    @blur=${()=>{sO.flush(e)}}></textarea>`,mO=e=>I(e===``,()=>B`<span class="muted">Empty note — press edit to write.</span>`,()=>B`${lO(e).map(fO)}`),hO=e=>I(e.editing,()=>pO(e),()=>B`<p class="read" data-testid=${Y.read}>${mO(e.sticker.text)}</p>`),gO=class extends H{static{this.properties={sticker:{attribute:!1},send:{attribute:!1},editing:{type:Boolean},draft:{state:!0}}}static{this.styles=[U,nO]}constructor(){super(),this.ctl={pending:void 0},this.editing=!1,this.draft=``}disconnectedCallback(){sO.flush(this),super.disconnectedCallback()}willUpdate(e){sO.modeChanged(this,e.has(`editing`))}render(){return hO(this)}};customElements.define(`tt-text-note`,gO);var _O=z`
   :host { display: flex; flex-direction: column; gap: 4px; }
   .surface { display: block; width: 100%; height: auto; aspect-ratio: 300 / 180;
     background-image: linear-gradient(var(--paper-dot) 1px, transparent 1px); background-size: 100% 24px; }
@@ -887,47 +890,47 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
   .dot-blue { background: var(--break); }
   .alt { display: flex; flex-direction: column; gap: 2px; font-size: 16px; padding-bottom: 4px; }
   .alt .inp { font-size: 17px; background: color-mix(in srgb, var(--card) 70%, transparent); }
-`,dO=zT(class extends BT{constructor(e){if(super(e),e.type!==RT.ATTRIBUTE||e.name!==`class`||e.strings?.length>2)throw Error("`classMap()` can only be used in the `class` attribute and must be the only part in the attribute.")}render(e){return` `+Object.keys(e).filter(t=>e[t]).join(` `)+` `}update(e,[t]){if(this.st===void 0){this.st=new Set,e.strings!==void 0&&(this.nt=new Set(e.strings.join(` `).split(/\s/).filter(e=>e!==``)));for(let e in t)t[e]&&!this.nt?.has(e)&&this.st.add(e);return this.render(t)}let n=e.element.classList;for(let e of this.st)e in t||(n.remove(e),this.st.delete(e));for(let e in t){let r=!!t[e];r===this.st.has(e)||this.nt?.has(e)||(r?(n.add(e),this.st.add(e)):(n.remove(e),this.st.delete(e)))}return Wy}}),fO=e=>String(Math.round(e*10)/10),pO=(e,t)=>`${fO(e)} ${fO(t)}`,mO=(e,t)=>I(e===0,()=>`move`,()=>I(e===t,()=>`line`,()=>`curve`)),hO=e=>(t,n)=>{let r=e[n+1]??t;switch(mO(n,e.length-1)){case`move`:return`M${pO(t[0],t[1])}`;case`line`:return` L${pO(t[0],t[1])}`;case`curve`:return` Q${pO(t[0],t[1])} ${pO((t[0]+r[0])/2,(t[1]+r[1])/2)}`}},gO=e=>e.map(hO(e)).join(``)+I(e.length===1,()=>` l0.01 0`,()=>``),_O=e=>I(e<=0,()=>.5,()=>Math.min(e,1)),vO=2.6,yO=.8,bO=18,xO=e=>I(e.points.length===0,()=>.5,()=>e.points.reduce((e,[,,t])=>e+_O(t),0)/e.points.length),SO=e=>{switch(e.tool){case`pen`:return Math.max(yO,vO*2*xO(e));case`eraser`:return bO}},CO=e=>{C(T(e.renderRoot.querySelector(`path.live`)),{onNone:()=>void 0,onSome:t=>{let n={tool:e.tool,color:e.ink,points:e.ctl.points};t.setAttribute(`d`,gO(n.points)),t.setAttribute(`stroke-width`,String(SO(n))),t.setAttribute(`class`,`live tool-${e.tool} ink-${e.ink}`)}})},wO=e=>{let t=I(`getCoalescedEvents`in e,()=>e.getCoalescedEvents(),()=>[]);return I(t.length===0,()=>[e],()=>t)},TO={width:300,height:180},EO=(e,t,n)=>{let r=Math.min(Math.max(0,e*n/Math.max(t,1)),n);return Math.round(r*10)/10},DO=e=>(t,n,r)=>[EO(t-e.left,e.width,TO.width),EO(n-e.top,e.height,TO.height),_O(r)],OO=(e,t)=>!(e&&t===`touch`),kO=e=>t=>DO(e.ctl.rect)(t.clientX,t.clientY,t.pressure),AO=e=>{e.ctl.active=void 0,e.ctl.points=[],CO(e)},jO=(e,t,n)=>{n.setPointerCapture(t.pointerId),e.ctl.rect=n.getBoundingClientRect(),e.ctl.active=t.pointerId,e.ctl.activeType=t.pointerType,e.ctl.points=[kO(e)(t)],CO(e)},MO=(e,t)=>{t.preventDefault();let n=t.pointerType===`pen`;L(n,()=>{e.ctl.pens.add(t.pointerId)}),L(n&&e.ctl.activeType===`touch`,()=>{AO(e)});let r=OO([...e.ctl.pens].some(e=>e!==t.pointerId),t.pointerType)&&e.ctl.active===void 0&&t.button===0;C(T(e.renderRoot.querySelector(`svg.surface`)),{onNone:()=>void 0,onSome:n=>{L(r,()=>{jO(e,t,n)})}})},NO={down:(e,t)=>{L(e.editing,()=>{MO(e,t)})},move:(e,t)=>{L(t.pointerId===e.ctl.active,()=>{e.ctl.points=[...e.ctl.points,...wO(t).map(kO(e))],CO(e)})},up:(e,t)=>{e.ctl.pens.delete(t.pointerId),L(t.pointerId===e.ctl.active,()=>{e.send(e.sticker.id,{type:`notes/strokeAdded`,stroke:{tool:e.tool,color:e.ink,points:e.ctl.points}}),AO(e)})},cancel:(e,t)=>{e.ctl.pens.delete(t.pointerId),L(t.pointerId===e.ctl.active,()=>{AO(e)})}},PO=(e,t,n)=>{switch(t.tool){case`pen`:return[...e,{kind:`ink`,key:n,stroke:t}];case`eraser`:return I(t.points.length===0,()=>[],()=>[{kind:`erased`,key:n,eraser:t,below:e}])}},FO=e=>e.reduce(PO,[]),IO=e=>{switch(e.kind){case`ink`:return Uy`<path data-testid=${Y.stroke} class=${`ink-${e.stroke.color}`} d=${gO(e.stroke.points)}
-      stroke-width=${SO(e.stroke)}></path>`;case`erased`:return Uy`
-      <mask id=${`m${String(e.key)}`} maskUnits="userSpaceOnUse" x="0" y="0" width=${TO.width} height=${TO.height}>
-        <rect width=${TO.width} height=${TO.height} fill="white"></rect>
-        <path class="cut" d=${gO(e.eraser.points)} stroke-width=${SO(e.eraser)}></path>
+`,vO=zT(class extends BT{constructor(e){if(super(e),e.type!==RT.ATTRIBUTE||e.name!==`class`||e.strings?.length>2)throw Error("`classMap()` can only be used in the `class` attribute and must be the only part in the attribute.")}render(e){return` `+Object.keys(e).filter(t=>e[t]).join(` `)+` `}update(e,[t]){if(this.st===void 0){this.st=new Set,e.strings!==void 0&&(this.nt=new Set(e.strings.join(` `).split(/\s/).filter(e=>e!==``)));for(let e in t)t[e]&&!this.nt?.has(e)&&this.st.add(e);return this.render(t)}let n=e.element.classList;for(let e of this.st)e in t||(n.remove(e),this.st.delete(e));for(let e in t){let r=!!t[e];r===this.st.has(e)||this.nt?.has(e)||(r?(n.add(e),this.st.add(e)):(n.remove(e),this.st.delete(e)))}return Wy}}),yO=e=>String(Math.round(e*10)/10),bO=(e,t)=>`${yO(e)} ${yO(t)}`,xO=(e,t)=>I(e===0,()=>`move`,()=>I(e===t,()=>`line`,()=>`curve`)),SO=e=>(t,n)=>{let r=e[n+1]??t;switch(xO(n,e.length-1)){case`move`:return`M${bO(t[0],t[1])}`;case`line`:return` L${bO(t[0],t[1])}`;case`curve`:return` Q${bO(t[0],t[1])} ${bO((t[0]+r[0])/2,(t[1]+r[1])/2)}`}},CO=e=>e.map(SO(e)).join(``)+I(e.length===1,()=>` l0.01 0`,()=>``),wO=e=>I(e<=0,()=>.5,()=>Math.min(e,1)),TO=2.6,EO=.8,DO=18,OO=e=>I(e.points.length===0,()=>.5,()=>e.points.reduce((e,[,,t])=>e+wO(t),0)/e.points.length),kO=e=>{switch(e.tool){case`pen`:return Math.max(EO,TO*2*OO(e));case`eraser`:return DO}},AO=e=>{C(T(e.renderRoot.querySelector(`path.live`)),{onNone:()=>void 0,onSome:t=>{let n={tool:e.tool,color:e.ink,points:e.ctl.points};t.setAttribute(`d`,CO(n.points)),t.setAttribute(`stroke-width`,String(kO(n))),t.setAttribute(`class`,`live tool-${e.tool} ink-${e.ink}`)}})},jO=e=>{let t=I(`getCoalescedEvents`in e,()=>e.getCoalescedEvents(),()=>[]);return I(t.length===0,()=>[e],()=>t)},MO={width:300,height:180},NO=(e,t,n)=>{let r=Math.min(Math.max(0,e*n/Math.max(t,1)),n);return Math.round(r*10)/10},PO=e=>(t,n,r)=>[NO(t-e.left,e.width,MO.width),NO(n-e.top,e.height,MO.height),wO(r)],FO=(e,t)=>!(e&&t===`touch`),IO=e=>t=>PO(e.ctl.rect)(t.clientX,t.clientY,t.pressure),LO=e=>{e.ctl.active=void 0,e.ctl.points=[],AO(e)},RO=(e,t,n)=>{n.setPointerCapture(t.pointerId),e.ctl.rect=n.getBoundingClientRect(),e.ctl.active=t.pointerId,e.ctl.activeType=t.pointerType,e.ctl.points=[IO(e)(t)],AO(e)},zO=(e,t)=>{t.preventDefault();let n=t.pointerType===`pen`;L(n,()=>{e.ctl.pens.add(t.pointerId)}),L(n&&e.ctl.activeType===`touch`,()=>{LO(e)});let r=FO([...e.ctl.pens].some(e=>e!==t.pointerId),t.pointerType)&&e.ctl.active===void 0&&t.button===0;C(T(e.renderRoot.querySelector(`svg.surface`)),{onNone:()=>void 0,onSome:n=>{L(r,()=>{RO(e,t,n)})}})},BO={down:(e,t)=>{L(e.editing,()=>{zO(e,t)})},move:(e,t)=>{L(t.pointerId===e.ctl.active,()=>{e.ctl.points=[...e.ctl.points,...jO(t).map(IO(e))],AO(e)})},up:(e,t)=>{e.ctl.pens.delete(t.pointerId),L(t.pointerId===e.ctl.active,()=>{e.send(e.sticker.id,{type:`notes/strokeAdded`,stroke:{tool:e.tool,color:e.ink,points:e.ctl.points}}),LO(e)})},cancel:(e,t)=>{e.ctl.pens.delete(t.pointerId),L(t.pointerId===e.ctl.active,()=>{LO(e)})}},VO=(e,t,n)=>{switch(t.tool){case`pen`:return[...e,{kind:`ink`,key:n,stroke:t}];case`eraser`:return I(t.points.length===0,()=>[],()=>[{kind:`erased`,key:n,eraser:t,below:e}])}},HO=e=>e.reduce(VO,[]),UO=e=>{switch(e.kind){case`ink`:return Uy`<path data-testid=${Y.stroke} class=${`ink-${e.stroke.color}`} d=${CO(e.stroke.points)}
+      stroke-width=${kO(e.stroke)}></path>`;case`erased`:return Uy`
+      <mask id=${`m${String(e.key)}`} maskUnits="userSpaceOnUse" x="0" y="0" width=${MO.width} height=${MO.height}>
+        <rect width=${MO.width} height=${MO.height} fill="white"></rect>
+        <path class="cut" d=${CO(e.eraser.points)} stroke-width=${kO(e.eraser)}></path>
       </mask>
-      <g mask=${`url(#m${String(e.key)})`}>${e.below.map(IO)}</g>`}},LO=e=>e.map(IO),RO=e=>Uy`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-  stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d=${e}></path></svg>`,zO={up:RO(`M12 19.5c.2-5 .1-10-.2-14.5M6 10.5c2-2 4-4 6-5.8 2 1.9 4 3.8 5.8 6`),down:RO(`M12 4.5c.2 5 .1 10-.2 14.5M6 13.5c2 2 4 4 6 5.8 2-1.9 4-3.8 5.8-6`),expand:RO(`M4 9.5c0-2 0-3.6.2-5.3 1.8-.1 3.4 0 5.2.1M14.6 4.1c1.8 0 3.5 0 5.3.2.1 1.8 0 3.4-.1 5.2M20 14.5c0 2 0 3.6-.2 5.3-1.8.1-3.4 0-5.2-.1M9.4 19.9c-1.8 0-3.5 0-5.3-.2-.1-1.8 0-3.4.1-5.2`),trash:RO(`M4.5 6.6c5-.4 10-.3 15 .1M9.5 6.3c0-1.3.3-2.2 1-2.3h3c.8.1 1 1 1 2.2M6.5 7c.4 4.2.7 8.4 1.2 12.6 3 .3 5.8.3 8.6 0 .4-4.2.8-8.4 1.1-12.5`),pen:RO(`M4.5 19.5c.4-1.7.8-3.3 1.4-4.9L16.2 4.3c1-1 2.6-.9 3.5.1.9 1 .8 2.4-.1 3.3L9.4 18.1c-1.6.6-3.2 1-4.9 1.4z`),eraser:RO(`M9 19.6h10.5M4.7 14.4l8.6-9.1c.9-.9 2.3-.9 3.2 0l2.6 2.7c.8.9.8 2.2 0 3.1l-7.8 8.4H8.9l-4.1-4c-.8-.3-.8-.8-.1-1.1z`),undo:RO(`M9 7.5 4.6 11.4 9.3 15M5.2 11.5c4.8-.4 9.8-.6 12.4 1.5 1.7 1.5 1.8 4 .6 6`),redo:RO(`M15 7.5l4.4 3.9-4.7 3.6M18.8 11.5c-4.8-.4-9.8-.6-12.4 1.5-1.7 1.5-1.8 4-.6 6`),edit:RO(`M4.5 19.5c.4-1.7.8-3.3 1.4-4.9L16.2 4.3c1-1 2.6-.9 3.5.1.9 1 .8 2.4-.1 3.3L9.4 18.1M13.5 20c2.1-.2 4.1-.1 6.2 0`)},BO=[`ink`,`red`,`blue`],VO={ink:`Black ink`,red:`Red ink`,blue:`Blue ink`},HO=(e,t)=>()=>{e.send(e.sticker.id,t)},UO=(e,t,n,r,i,a=`ico`)=>B`
-  <button type="button" class=${a} data-testid=${e} aria-label=${t} aria-disabled=${String(r)} @click=${i}>${n}</button>`,WO=(e,t,n,r,i)=>B`
-  <button type="button" class="ico" data-testid=${e} aria-label=${t} aria-pressed=${String(n)} @click=${i}>${r}</button>`,GO=e=>B`
+      <g mask=${`url(#m${String(e.key)})`}>${e.below.map(UO)}</g>`}},WO=e=>e.map(UO),GO=e=>Uy`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+  stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d=${e}></path></svg>`,KO={up:GO(`M12 19.5c.2-5 .1-10-.2-14.5M6 10.5c2-2 4-4 6-5.8 2 1.9 4 3.8 5.8 6`),down:GO(`M12 4.5c.2 5 .1 10-.2 14.5M6 13.5c2 2 4 4 6 5.8 2-1.9 4-3.8 5.8-6`),expand:GO(`M4 9.5c0-2 0-3.6.2-5.3 1.8-.1 3.4 0 5.2.1M14.6 4.1c1.8 0 3.5 0 5.3.2.1 1.8 0 3.4-.1 5.2M20 14.5c0 2 0 3.6-.2 5.3-1.8.1-3.4 0-5.2-.1M9.4 19.9c-1.8 0-3.5 0-5.3-.2-.1-1.8 0-3.4.1-5.2`),trash:GO(`M4.5 6.6c5-.4 10-.3 15 .1M9.5 6.3c0-1.3.3-2.2 1-2.3h3c.8.1 1 1 1 2.2M6.5 7c.4 4.2.7 8.4 1.2 12.6 3 .3 5.8.3 8.6 0 .4-4.2.8-8.4 1.1-12.5`),pen:GO(`M4.5 19.5c.4-1.7.8-3.3 1.4-4.9L16.2 4.3c1-1 2.6-.9 3.5.1.9 1 .8 2.4-.1 3.3L9.4 18.1c-1.6.6-3.2 1-4.9 1.4z`),eraser:GO(`M9 19.6h10.5M4.7 14.4l8.6-9.1c.9-.9 2.3-.9 3.2 0l2.6 2.7c.8.9.8 2.2 0 3.1l-7.8 8.4H8.9l-4.1-4c-.8-.3-.8-.8-.1-1.1z`),undo:GO(`M9 7.5 4.6 11.4 9.3 15M5.2 11.5c4.8-.4 9.8-.6 12.4 1.5 1.7 1.5 1.8 4 .6 6`),redo:GO(`M15 7.5l4.4 3.9-4.7 3.6M18.8 11.5c-4.8-.4-9.8-.6-12.4 1.5-1.7 1.5-1.8 4-.6 6`),edit:GO(`M4.5 19.5c.4-1.7.8-3.3 1.4-4.9L16.2 4.3c1-1 2.6-.9 3.5.1.9 1 .8 2.4-.1 3.3L9.4 18.1M13.5 20c2.1-.2 4.1-.1 6.2 0`)},qO=[`ink`,`red`,`blue`],JO={ink:`Black ink`,red:`Red ink`,blue:`Blue ink`},YO=(e,t)=>()=>{e.send(e.sticker.id,t)},XO=(e,t,n,r,i,a=`ico`)=>B`
+  <button type="button" class=${a} data-testid=${e} aria-label=${t} aria-disabled=${String(r)} @click=${i}>${n}</button>`,ZO=(e,t,n,r,i)=>B`
+  <button type="button" class="ico" data-testid=${e} aria-label=${t} aria-pressed=${String(n)} @click=${i}>${r}</button>`,QO=e=>B`
   <section class="tools" aria-label="Drawing tools">
     <span role="group" aria-label="Tool" class="group">
-      ${WO(Y.pen,`Pen`,e.tool===`pen`,zO.pen,()=>{e.tool=`pen`})}
-      ${WO(Y.eraser,`Eraser`,e.tool===`eraser`,zO.eraser,()=>{e.tool=`eraser`})}
+      ${ZO(Y.pen,`Pen`,e.tool===`pen`,KO.pen,()=>{e.tool=`pen`})}
+      ${ZO(Y.eraser,`Eraser`,e.tool===`eraser`,KO.eraser,()=>{e.tool=`eraser`})}
     </span>
     <span role="group" aria-label="Ink colour" class="group">
-      ${BO.map(t=>WO(Y.ink(t),VO[t],e.ink===t,B`<span class=${`dot dot-${t}`}></span>`,()=>{e.ink=t,e.tool=`pen`}))}
+      ${qO.map(t=>ZO(Y.ink(t),JO[t],e.ink===t,B`<span class=${`dot dot-${t}`}></span>`,()=>{e.ink=t,e.tool=`pen`}))}
     </span>
     <span class="group">
-      ${UO(Y.undo,`Undo stroke`,zO.undo,e.sticker.strokes.length===0,HO(e,{type:`notes/strokeUndone`}))}
-      ${UO(Y.redo,`Redo stroke`,zO.redo,e.sticker.redo.length===0,HO(e,{type:`notes/strokeRedone`}))}
-      ${UO(Y.clear,`Clear drawing`,`clear`,FO(e.sticker.strokes).length===0,HO(e,{type:`notes/cleared`}),`link`)}
+      ${XO(Y.undo,`Undo stroke`,KO.undo,e.sticker.strokes.length===0,YO(e,{type:`notes/strokeUndone`}))}
+      ${XO(Y.redo,`Redo stroke`,KO.redo,e.sticker.redo.length===0,YO(e,{type:`notes/strokeRedone`}))}
+      ${XO(Y.clear,`Clear drawing`,`clear`,HO(e.sticker.strokes).length===0,YO(e,{type:`notes/cleared`}),`link`)}
     </span>
-  </section>`,KO=e=>B`
+  </section>`,$O=e=>B`
   <p class="hint muted">draw with a finger or a stylus</p>
-  ${GO(e)}
+  ${QO(e)}
   <label class="alt">
     <span>Describe the sketch (optional)</span>
     <input class="inp sk2" data-testid=${Y.alt} .value=${e.sticker.alt} placeholder="e.g. load curve going up"
-      @change=${t=>{e.send(e.sticker.id,{type:`notes/altChanged`,alt:iO(t)})}}>
-  </label>`,qO=e=>B`
-  <svg class=${dO({surface:!0,editing:e.editing})} viewBox=${`0 0 ${String(TO.width)} ${String(TO.height)}`}
+      @change=${t=>{e.send(e.sticker.id,{type:`notes/altChanged`,alt:dO(t)})}}>
+  </label>`,ek=e=>B`
+  <svg class=${vO({surface:!0,editing:e.editing})} viewBox=${`0 0 ${String(MO.width)} ${String(MO.height)}`}
     role="img" data-testid=${Y.sketch} aria-label=${e.sticker.alt.trim()||`Sketch without description`}
-    @pointerdown=${t=>{NO.down(e,t)}}
-    @pointermove=${t=>{NO.move(e,t)}}
-    @pointerup=${t=>{NO.up(e,t)}}
-    @pointercancel=${t=>{NO.cancel(e,t)}}>
-    ${LO(FO(e.sticker.strokes))}
+    @pointerdown=${t=>{BO.down(e,t)}}
+    @pointermove=${t=>{BO.move(e,t)}}
+    @pointerup=${t=>{BO.up(e,t)}}
+    @pointercancel=${t=>{BO.cancel(e,t)}}>
+    ${WO(HO(e.sticker.strokes))}
     <path class="live" d=""></path>
   </svg>
-  ${I(e.editing,()=>KO(e),()=>V)}`,JO=class extends H{static{this.properties={sticker:{attribute:!1},send:{attribute:!1},large:{type:Boolean,reflect:!0},editing:{type:Boolean},tool:{state:!0},ink:{state:!0}}}static{this.styles=[U,uO]}constructor(){super(),this.ctl={pens:new Set,active:void 0,activeType:``,points:[],rect:{left:0,top:0,width:1,height:1}},this.large=!1,this.editing=!1,this.tool=`pen`,this.ink=`ink`}render(){return qO(this)}};customElements.define(`tt-sketch`,JO);var YO=z`
+  ${I(e.editing,()=>$O(e),()=>V)}`,tk=class extends H{static{this.properties={sticker:{attribute:!1},send:{attribute:!1},large:{type:Boolean,reflect:!0},editing:{type:Boolean},tool:{state:!0},ink:{state:!0}}}static{this.styles=[U,_O]}constructor(){super(),this.ctl={pens:new Set,active:void 0,activeType:``,points:[],rect:{left:0,top:0,width:1,height:1}},this.large=!1,this.editing=!1,this.tool=`pen`,this.ink=`ink`}render(){return ek(this)}};customElements.define(`tt-sketch`,tk);var nk=z`
   :host { display: block; }
   .paper { position: relative; display: flex; flex-direction: column; gap: 4px; padding: 12px 14px 4px;
     background: var(--sheet); transform: rotate(var(--tilt)); border-radius: 2px 2px 14px 2px;
@@ -945,32 +948,32 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
   .swatch[aria-pressed='true'] .chip-color { outline: 3px solid var(--ink); outline-offset: 2px; }
   .ico[aria-disabled='true'] { opacity: .45; cursor: not-allowed; }
   @media (prefers-reduced-motion: reduce) { .paper { transform: none; } }
-`,XO=e=>(Array.from(e).reduce((e,t)=>(e*31+(t.codePointAt(0)??0))%9973,7)%25-12)/10,ZO=(e,t,n)=>{e.ctl.refocus=n,e.send(e.sticker.id,{type:`notes/moved`,toIndex:e.index+t})},QO=[`yellow`,`peach`,`blue`,`green`],$O={yellow:`Yellow`,peach:`Peach`,blue:`Blue`,green:`Green`},ek=e=>t=>B`
-  <button type="button" class="ico swatch" data-testid=${Y.color(t)} aria-label=${`${$O[t]} paper`}
+`,rk=e=>(Array.from(e).reduce((e,t)=>(e*31+(t.codePointAt(0)??0))%9973,7)%25-12)/10,ik=(e,t,n)=>{e.ctl.refocus=n,e.send(e.sticker.id,{type:`notes/moved`,toIndex:e.index+t})},ak=[`yellow`,`peach`,`blue`,`green`],ok={yellow:`Yellow`,peach:`Peach`,blue:`Blue`,green:`Green`},sk=e=>t=>B`
+  <button type="button" class="ico swatch" data-testid=${Y.color(t)} aria-label=${`${ok[t]} paper`}
     aria-pressed=${String(e.sticker.color===t)}
     @click=${()=>{e.send(e.sticker.id,{type:`notes/colorChanged`,color:t})}}>
     <span class="chip-color" style=${`background: var(--st-${t})`}></span>
-  </button>`,tk=(e,t,n,r,i=!1)=>B`
+  </button>`,ck=(e,t,n,r,i=!1)=>B`
   <button type="button" class="ico" data-testid=${e} aria-label=${t} aria-disabled=${String(i)}
-    @click=${r}>${n}</button>`,nk=e=>B`
+    @click=${r}>${n}</button>`,lk=e=>B`
   <section id="opts" class="opts" aria-label="Sticker options">
-    <span class="swatches" role="group" aria-label="Paper colour">${QO.map(ek(e))}</span>
-    ${tk(Y.moveUp,`Move up`,zO.up,()=>{ZO(e,-1,Y.moveUp)},e.index===0)}
-    ${tk(Y.moveDown,`Move down`,zO.down,()=>{ZO(e,1,Y.moveDown)},e.index>=e.count-1)}
-    ${I(e.large,()=>V,()=>tk(Y.expand,`Open full screen`,zO.expand,()=>{e.menuOpen=!1,e.expand(e.sticker.id)}))}
-    ${tk(Y.remove,`Delete sticker`,zO.trash,()=>{e.send(e.sticker.id,{type:`notes/removed`})})}
-  </section>`,rk=e=>B`
+    <span class="swatches" role="group" aria-label="Paper colour">${ak.map(sk(e))}</span>
+    ${ck(Y.moveUp,`Move up`,KO.up,()=>{ik(e,-1,Y.moveUp)},e.index===0)}
+    ${ck(Y.moveDown,`Move down`,KO.down,()=>{ik(e,1,Y.moveDown)},e.index>=e.count-1)}
+    ${I(e.large,()=>V,()=>ck(Y.expand,`Open full screen`,KO.expand,()=>{e.menuOpen=!1,e.expand(e.sticker.id)}))}
+    ${ck(Y.remove,`Delete sticker`,KO.trash,()=>{e.send(e.sticker.id,{type:`notes/removed`})})}
+  </section>`,uk=e=>B`
   <button type="button" class="ico toggle" data-testid=${Y.editMode} aria-label="Edit sticker"
     aria-pressed=${String(e.editing)} @click=${()=>{e.editing=!e.editing}}>
-    ${zO.edit}<span aria-hidden="true">${I(e.editing,()=>`done`,()=>`edit`)}</span>
-  </button>`,ik=e=>{let t=e.sticker;switch(t.kind){case`text`:return B`<tt-text-note .sticker=${t} .send=${e.send} .editing=${e.editing}></tt-text-note>`;case`sketch`:return B`<tt-sketch .sticker=${t} .send=${e.send} ?large=${e.large} .editing=${e.editing}></tt-sketch>`}},ak={text:`Text sticker`,sketch:`Sketch sticker`},ok=e=>B`
+    ${KO.edit}<span aria-hidden="true">${I(e.editing,()=>`done`,()=>`edit`)}</span>
+  </button>`,dk=e=>{let t=e.sticker;switch(t.kind){case`text`:return B`<tt-text-note .sticker=${t} .send=${e.send} .editing=${e.editing}></tt-text-note>`;case`sketch`:return B`<tt-sketch .sticker=${t} .send=${e.send} ?large=${e.large} .editing=${e.editing}></tt-sketch>`}},fk={text:`Text sticker`,sketch:`Sketch sticker`},pk=e=>B`
   <article class="paper" data-testid=${Y.sticker} data-color=${e.sticker.color}
-    style=${`--tilt: ${String(XO(e.sticker.id))}deg; --sheet: var(--st-${e.sticker.color})`}
-    aria-label=${`${ak[e.sticker.kind]} ${String(e.index+1)} of ${String(e.count)}`}>
+    style=${`--tilt: ${String(rk(e.sticker.id))}deg; --sheet: var(--st-${e.sticker.color})`}
+    aria-label=${`${fk[e.sticker.kind]} ${String(e.index+1)} of ${String(e.count)}`}>
     <span class="tape" aria-hidden="true"></span>
-    ${ik(e)}
+    ${dk(e)}
     <footer class="foot">
-      ${rk(e)}
+      ${uk(e)}
       <button type="button" class="ico" data-testid=${Y.menu} aria-label="Sticker options" aria-controls="opts"
         aria-expanded=${String(e.menuOpen)} @click=${()=>{e.menuOpen=!e.menuOpen}}>
         <svg width="26" height="26" viewBox="0 0 26 26" fill="currentColor" aria-hidden="true">
@@ -978,8 +981,8 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
         </svg>
       </button>
     </footer>
-    ${I(e.menuOpen,()=>nk(e),()=>V)}
-  </article>`,sk=e=>{C(T(e.ctl.refocus),{onNone:()=>void 0,onSome:t=>{e.ctl.refocus=void 0,XD(e.renderRoot,t)}})},ck=class extends H{static{this.properties={sticker:{attribute:!1},index:{type:Number},count:{type:Number},send:{attribute:!1},expand:{attribute:!1},fresh:{type:Boolean},large:{type:Boolean,reflect:!0},menuOpen:{state:!0},editing:{state:!0}}}static{this.styles=[U,YO]}constructor(){super(),this.ctl={refocus:void 0},this.fresh=!1,this.large=!1,this.menuOpen=!1,this.editing=!1}connectedCallback(){super.connectedCallback(),this.updateComplete.then(()=>{sk(this)})}willUpdate(){L(!this.hasUpdated,()=>{this.editing=this.fresh||this.large})}render(){return ok(this)}};customElements.define(`tt-sticker`,ck);var lk=z`
+    ${I(e.menuOpen,()=>lk(e),()=>V)}
+  </article>`,mk=e=>{C(T(e.ctl.refocus),{onNone:()=>void 0,onSome:t=>{e.ctl.refocus=void 0,rO(e.renderRoot,t)}})},hk=class extends H{static{this.properties={sticker:{attribute:!1},index:{type:Number},count:{type:Number},send:{attribute:!1},expand:{attribute:!1},fresh:{type:Boolean},large:{type:Boolean,reflect:!0},menuOpen:{state:!0},editing:{state:!0}}}static{this.styles=[U,nk]}constructor(){super(),this.ctl={refocus:void 0},this.fresh=!1,this.large=!1,this.menuOpen=!1,this.editing=!1}connectedCallback(){super.connectedCallback(),this.updateComplete.then(()=>{mk(this)})}willUpdate(){L(!this.hasUpdated,()=>{this.editing=this.fresh||this.large})}render(){return pk(this)}};customElements.define(`tt-sticker`,hk);var gk=z`
   :host { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
   .bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .title { font-size: 30px; flex-grow: 1; }
@@ -1000,9 +1003,9 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
       gap: 12px; overflow-x: auto; overscroll-behavior-x: contain; padding: 8px 4px 6px; }
     .full { max-height: 100dvh; overflow-y: auto; }
   }
-`,uk=(e,t,n)=>{let r=new Map;for(let i=t;i<=n;i++)r.set(e[i],i);return r},dk=zT(class extends BT{constructor(e){if(super(e),e.type!==RT.CHILD)throw Error(`repeat() can only be used in text expressions`)}dt(e,t,n){let r;n===void 0?n=t:t!==void 0&&(r=t);let i=[],a=[],o=0;for(let t of e)i[o]=r?r(t,o):o,a[o]=n(t,o),o++;return{values:a,keys:i}}render(e,t,n){return this.dt(e,t,n).values}update(e,[t,n,r]){let i=YT(e),{values:a,keys:o}=this.dt(t,n,r);if(!Array.isArray(i))return this.ut=o,a;let s=this.ut??=[],c=[],l,u,d=0,f=i.length-1,p=0,m=a.length-1;for(;d<=f&&p<=m;)if(i[d]===null)d++;else if(i[f]===null)f--;else if(s[d]===o[p])c[p]=KT(i[d],a[p]),d++,p++;else if(s[f]===o[m])c[m]=KT(i[f],a[m]),f--,m--;else if(s[d]===o[m])c[m]=KT(i[d],a[m]),GT(e,c[m+1],i[d]),d++,m--;else if(s[f]===o[p])c[p]=KT(i[f],a[p]),GT(e,i[d],i[f]),f--,p++;else if(l===void 0&&(l=uk(o,p,m),u=uk(s,d,f)),l.has(s[d])){if(l.has(s[f])){let t=u.get(o[p]),n=t===void 0?null:i[t];if(n===null){let t=GT(e,i[d]);KT(t,a[p]),c[p]=t}else c[p]=KT(n,a[p]),GT(e,i[d],n),i[t]=null;p++}else XT(i[f]),f--}else XT(i[d]),d++;for(;p<=m;){let t=GT(e,c[m+1]);KT(t,a[p]),c[p++]=t}for(;d<=f;){let e=i[d++];e!==null&&XT(e)}return this.ut=o,JT(e,c),Wy}}),fk=(e,t)=>B`
+`,_k=(e,t,n)=>{let r=new Map;for(let i=t;i<=n;i++)r.set(e[i],i);return r},vk=zT(class extends BT{constructor(e){if(super(e),e.type!==RT.CHILD)throw Error(`repeat() can only be used in text expressions`)}dt(e,t,n){let r;n===void 0?n=t:t!==void 0&&(r=t);let i=[],a=[],o=0;for(let t of e)i[o]=r?r(t,o):o,a[o]=n(t,o),o++;return{values:a,keys:i}}render(e,t,n){return this.dt(e,t,n).values}update(e,[t,n,r]){let i=YT(e),{values:a,keys:o}=this.dt(t,n,r);if(!Array.isArray(i))return this.ut=o,a;let s=this.ut??=[],c=[],l,u,d=0,f=i.length-1,p=0,m=a.length-1;for(;d<=f&&p<=m;)if(i[d]===null)d++;else if(i[f]===null)f--;else if(s[d]===o[p])c[p]=KT(i[d],a[p]),d++,p++;else if(s[f]===o[m])c[m]=KT(i[f],a[m]),f--,m--;else if(s[d]===o[m])c[m]=KT(i[d],a[m]),GT(e,c[m+1],i[d]),d++,m--;else if(s[f]===o[p])c[p]=KT(i[f],a[p]),GT(e,i[d],i[f]),f--,p++;else if(l===void 0&&(l=_k(o,p,m),u=_k(s,d,f)),l.has(s[d])){if(l.has(s[f])){let t=u.get(o[p]),n=t===void 0?null:i[t];if(n===null){let t=GT(e,i[d]);KT(t,a[p]),c[p]=t}else c[p]=KT(n,a[p]),GT(e,i[d],n),i[t]=null;p++}else XT(i[f]),f--}else XT(i[d]),d++;for(;p<=m;){let t=GT(e,c[m+1]);KT(t,a[p]),c[p++]=t}for(;d<=f;){let e=i[d++];e!==null&&XT(e)}return this.ut=o,JT(e,c),Wy}}),yk=(e,t)=>B`
   <p class="toast sk2" role="status" data-testid=${Y.toast}>${C(T(e),{onNone:()=>V,onSome:()=>B`<span>Sticker deleted</span>
-      <button type="button" class="link" data-testid=${Y.restore} @click=${t.restore}>Undo</button>`})}</p>`,pk=(e,t)=>B`
+      <button type="button" class="link" data-testid=${Y.restore} @click=${t.restore}>Undo</button>`})}</p>`,bk=(e,t)=>B`
   <dialog class="full" data-testid=${Y.dialog} aria-labelledby="full-title" @close=${t.closeExpanded}>
     <header class="bar">
       <h2 id="full-title" class="head title">Sticker</h2>
@@ -1014,42 +1017,42 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
     </header>
     ${C(e,{onNone:()=>V,onSome:e=>B`<tt-sticker large .sticker=${e} .index=${0} .count=${1} .send=${t.send}
         .expand=${t.expand} .fresh=${!1}></tt-sticker>`})}
-  </dialog>`,mk=(e,t)=>B`
+  </dialog>`,xk=(e,t)=>B`
   <ol class="list" aria-labelledby="notes-title">
-    ${dk(e.stickers,e=>e.id,(n,r)=>B`<li>
+    ${vk(e.stickers,e=>e.id,(n,r)=>B`<li>
       <tt-sticker .sticker=${n} .index=${r} .count=${e.stickers.length} .send=${t.send} .expand=${t.expand}
         .fresh=${n.id===t.fresh}></tt-sticker>
     </li>`)}
-  </ol>`,hk=({page:e,toast:t,expanded:n,ctl:r})=>B`
+  </ol>`,Sk=({page:e,toast:t,expanded:n,ctl:r})=>B`
   <header class="bar">
     <h2 id="notes-title" class="head title">Notes</h2>
     ${C(e,{onNone:()=>V,onSome:()=>B`
         <button type="button" class="btn sk" data-testid=${Y.addText} @click=${()=>{r.add(`text`)}}>+ Text</button>
         <button type="button" class="btn sk2" data-testid=${Y.addSketch} @click=${()=>{r.add(`sketch`)}}>+ Sketch</button>`})}
   </header>
-  ${C(e,{onNone:()=>B`<p class="muted">Open a page to keep notes.</p>`,onSome:e=>mk(e,r)})}
-  ${fk(t,r)}
-  ${pk(O(e,e=>T(e.stickers.find(e=>e.id===n))),r)}
-`,gk=(e,t)=>{C(e.services(),{onNone:()=>void 0,onSome:e=>C(T(e.store.getState().pages.currentPageId),{onNone:()=>void 0,onSome:n=>{t(e,n)}})})},_k=(e,t)=>{globalThis.clearTimeout(t.toastTimer),t.toastTimer=void 0;let n=e.renderRoot,r=n instanceof ShadowRoot&&n.activeElement?.getAttribute(`data-testid`)===Y.restore;e.toast=void 0,L(r,()=>{XD(n,Y.addText)})},vk=5e3,yk=(e,t,n)=>{globalThis.clearTimeout(t.toastTimer),e.toast=n,t.toastTimer=globalThis.setTimeout(()=>{_k(e,t)},vk),e.updateComplete.then(()=>{XD(e.renderRoot,Y.restore)})},bk={text:`green`,sketch:`yellow`},xk=(e,t)=>{let n={fresh:void 0,toastTimer:void 0,send:(r,i)=>{gk(t,(e,t)=>{e.store.dispatch({...i,at:e.now(),pageId:t,id:r})}),L(i.type===`notes/removed`,()=>{yk(e,n,r)})},add:e=>{gk(t,(t,r)=>{let i=t.newId();n.fresh=i,t.store.dispatch({type:`notes/added`,at:t.now(),pageId:r,id:i,kind:e,color:bk[e]})})},restore:()=>{let r=e.toast??``;gk(t,(e,t)=>{e.store.dispatch({type:`notes/restored`,at:e.now(),pageId:t,id:r})}),_k(e,n)},expand:t=>{e.expanded=t},closeExpanded:()=>{e.expanded=void 0}};return n},Sk=e=>{C(T(e.renderRoot.querySelector(`dialog`)),{onNone:()=>void 0,onSome:t=>{let n=e.expanded!==void 0;I(n===t.open,()=>void 0,()=>{I(n,()=>{t.showModal()},()=>{t.close()})})}})},Ck=e=>O(T(e.pages.currentPageId),t=>T(e.pages.byId[t])),wk=class extends H{constructor(...e){super(...e),this.link=W(this),this.ctl=xk(this,this.link)}static{this.properties={toast:{state:!0},expanded:{state:!0}}}static{this.styles=[U,lk]}connectedCallback(){super.connectedCallback(),this.dataset.testid=Y.column}render(){return G(this.link)(e=>hk({page:Ck(e),toast:this.toast,expanded:this.expanded,ctl:this.ctl}))}updated(){this.ctl.fresh=void 0,Sk(this)}};customElements.define(`tt-notes-column`,wk);var Tk=e=>_S(e).pipe(O(t=>{let n=Ep(e.pages,t.projectId);return T(n[n.findIndex(e=>e.id===t.id)+1])})),Ek=(e,t)=>e.projects[t]?.name??`Unknown project`,Dk=(e,t)=>T(e.pages.currentProjectId).pipe(er(n=>!Object.values(e.pages.byId).some(e=>e.projectId===n&&e.date===t))),Ok=(e,t)=>Object.fromEntries(new Intl.DateTimeFormat(`en-GB`,{...t,timeZone:`UTC`}).formatToParts(Date.parse(`${e}T00:00:00Z`)).map(e=>[e.type,e.value])),kk=e=>{let t=Ok(e,{day:`numeric`,month:`short`});return`${t.day??``} ${t.month??``}`},Ak=e=>{let t=Ok(e,{weekday:`long`,day:`numeric`,month:`long`});return`${t.weekday??``}, ${t.day??``} ${t.month??``}`},jk=(e,t)=>{let n=Object.values(e.pages.byId).filter(e=>e.projectId===t.projectId&&e.date===t.date).toSorted((e,t)=>e.createdAt-t.createdAt);return{index:n.findIndex(e=>e.id===t.id)+1,count:n.length}},Mk=(e,t,n)=>{let{index:r,count:i}=jk(e,t),a=I(t.date===n,()=>`page ${String(r)} of today`,()=>`page ${String(r)} of ${String(i)}`),o=I(vS(t,n),()=>` · read-only`,()=>``);return`${Ak(t.date)} · ${a}${o}`},Nk=(e,t)=>{let n=_S(e),r=e.pages.currentProjectId;return{title:T(r).pipe(D(t=>Ek(e.catalog,t)),w(()=>`No project`)),dateLine:n.pipe(D(n=>Mk(e,n,t)),w(()=>`No page yet`)),readOnly:n.pipe(er(e=>vS(e,t))),closed:n.pipe(er(e=>e.closedAt!==void 0)),previous:Tk(e).pipe(D(e=>({id:e.id,label:`← ${kk(e.date)}`,ariaLabel:`Previous page, ${kk(e.date)}`})),Zn),offerToday:Dk(e,t),projectId:r}},X={header:`page-header`,title:`page-title`,dateLine:`page-date`,menuButton:`page-open-menu`,previous:`page-previous`,newPage:`page-new`,startToday:`page-start-today`,dayClosed:`page-day-closed`,menu:`project-menu`,menuClose:`project-menu-close`,project:e=>`menu-project-${e}`,removeProject:e=>`menu-remove-${e}`,addProject:`menu-add-project`,addable:e=>`menu-addable-${e}`,newProject:`menu-new-project`,newProjectName:`menu-new-project-name`,createProject:`menu-create-project`,pageRow:`menu-page`,settings:`menu-settings`},Pk=B`<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2.2"
-  stroke-linecap="round" aria-hidden="true"><path d="M4 7c6-1 12 1 18-.5M4 13.2c5 .6 12-.8 18 .3M4 19c7-1 11 .7 18-.4"></path></svg>`,Fk=(e,t)=>T(e.previous).pipe(C({onNone:()=>V,onSome:e=>B`<button type="button" class="btn sk" data-testid=${X.previous} aria-label=${e.ariaLabel}
-      @click=${()=>{t.openPage(e.id)}}>${e.label}</button>`})),Ik=(e,t)=>I(e.projectId!==void 0&&!e.offerToday,()=>B`<button type="button" class="btn sk2" data-testid=${X.newPage} @click=${t.createPage}>+ New page</button>`,()=>V),Lk=(e,t)=>B`${Fk(e,t)}${Ik(e,t)}`,Rk=(e,t)=>I(e.offerToday,()=>B`
+  ${C(e,{onNone:()=>B`<p class="muted">Open a page to keep notes.</p>`,onSome:e=>xk(e,r)})}
+  ${yk(t,r)}
+  ${bk(O(e,e=>T(e.stickers.find(e=>e.id===n))),r)}
+`,Ck=(e,t)=>{C(e.services(),{onNone:()=>void 0,onSome:e=>C(T(e.store.getState().pages.currentPageId),{onNone:()=>void 0,onSome:n=>{t(e,n)}})})},wk=(e,t)=>{globalThis.clearTimeout(t.toastTimer),t.toastTimer=void 0;let n=e.renderRoot,r=n instanceof ShadowRoot&&n.activeElement?.getAttribute(`data-testid`)===Y.restore;e.toast=void 0,L(r,()=>{rO(n,Y.addText)})},Tk=5e3,Ek=(e,t,n)=>{globalThis.clearTimeout(t.toastTimer),e.toast=n,t.toastTimer=globalThis.setTimeout(()=>{wk(e,t)},Tk),e.updateComplete.then(()=>{rO(e.renderRoot,Y.restore)})},Dk={text:`green`,sketch:`yellow`},Ok=(e,t)=>{let n={fresh:void 0,toastTimer:void 0,send:(r,i)=>{Ck(t,(e,t)=>{e.store.dispatch({...i,at:e.now(),pageId:t,id:r})}),L(i.type===`notes/removed`,()=>{Ek(e,n,r)})},add:e=>{Ck(t,(t,r)=>{let i=t.newId();n.fresh=i,t.store.dispatch({type:`notes/added`,at:t.now(),pageId:r,id:i,kind:e,color:Dk[e]})})},restore:()=>{let r=e.toast??``;Ck(t,(e,t)=>{e.store.dispatch({type:`notes/restored`,at:e.now(),pageId:t,id:r})}),wk(e,n)},expand:t=>{e.expanded=t},closeExpanded:()=>{e.expanded=void 0}};return n},kk=e=>{C(T(e.renderRoot.querySelector(`dialog`)),{onNone:()=>void 0,onSome:t=>{let n=e.expanded!==void 0;I(n===t.open,()=>void 0,()=>{I(n,()=>{t.showModal()},()=>{t.close()})})}})},Ak=e=>O(T(e.pages.currentPageId),t=>T(e.pages.byId[t])),jk=class extends H{constructor(...e){super(...e),this.link=W(this),this.ctl=Ok(this,this.link)}static{this.properties={toast:{state:!0},expanded:{state:!0}}}static{this.styles=[U,gk]}connectedCallback(){super.connectedCallback(),this.dataset.testid=Y.column}render(){return G(this.link)(e=>Sk({page:Ak(e),toast:this.toast,expanded:this.expanded,ctl:this.ctl}))}updated(){this.ctl.fresh=void 0,kk(this)}};customElements.define(`tt-notes-column`,jk);var Mk=e=>_S(e).pipe(O(t=>{let n=Ep(e.pages,t.projectId);return T(n[n.findIndex(e=>e.id===t.id)+1])})),Nk=(e,t)=>e.projects[t]?.name??`Unknown project`,Pk=(e,t)=>T(e.pages.currentProjectId).pipe(er(n=>!Object.values(e.pages.byId).some(e=>e.projectId===n&&e.date===t))),Fk=(e,t)=>Object.fromEntries(new Intl.DateTimeFormat(`en-GB`,{...t,timeZone:`UTC`}).formatToParts(Date.parse(`${e}T00:00:00Z`)).map(e=>[e.type,e.value])),Ik=e=>{let t=Fk(e,{day:`numeric`,month:`short`});return`${t.day??``} ${t.month??``}`},Lk=e=>{let t=Fk(e,{weekday:`long`,day:`numeric`,month:`long`});return`${t.weekday??``}, ${t.day??``} ${t.month??``}`},Rk=(e,t)=>{let n=Object.values(e.pages.byId).filter(e=>e.projectId===t.projectId&&e.date===t.date).toSorted((e,t)=>e.createdAt-t.createdAt);return{index:n.findIndex(e=>e.id===t.id)+1,count:n.length}},zk=(e,t,n)=>{let{index:r,count:i}=Rk(e,t),a=I(t.date===n,()=>`page ${String(r)} of today`,()=>`page ${String(r)} of ${String(i)}`),o=I(vS(t,n),()=>` · read-only`,()=>``);return`${Lk(t.date)} · ${a}${o}`},Bk=(e,t)=>{let n=_S(e),r=e.pages.currentProjectId;return{title:T(r).pipe(D(t=>Nk(e.catalog,t)),w(()=>`No project`)),dateLine:n.pipe(D(n=>zk(e,n,t)),w(()=>`No page yet`)),readOnly:n.pipe(er(e=>vS(e,t))),closed:n.pipe(er(e=>e.closedAt!==void 0)),previous:Mk(e).pipe(D(e=>({id:e.id,label:`← ${Ik(e.date)}`,ariaLabel:`Previous page, ${Ik(e.date)}`})),Zn),offerToday:Pk(e,t),projectId:r}},X={header:`page-header`,title:`page-title`,dateLine:`page-date`,menuButton:`page-open-menu`,previous:`page-previous`,newPage:`page-new`,startToday:`page-start-today`,dayClosed:`page-day-closed`,menu:`project-menu`,menuClose:`project-menu-close`,project:e=>`menu-project-${e}`,removeProject:e=>`menu-remove-${e}`,addProject:`menu-add-project`,addable:e=>`menu-addable-${e}`,newProject:`menu-new-project`,newProjectName:`menu-new-project-name`,createProject:`menu-create-project`,pageRow:`menu-page`,settings:`menu-settings`},Vk=B`<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2.2"
+  stroke-linecap="round" aria-hidden="true"><path d="M4 7c6-1 12 1 18-.5M4 13.2c5 .6 12-.8 18 .3M4 19c7-1 11 .7 18-.4"></path></svg>`,Hk=(e,t)=>T(e.previous).pipe(C({onNone:()=>V,onSome:e=>B`<button type="button" class="btn sk" data-testid=${X.previous} aria-label=${e.ariaLabel}
+      @click=${()=>{t.openPage(e.id)}}>${e.label}</button>`})),Uk=(e,t)=>I(e.projectId!==void 0&&!e.offerToday,()=>B`<button type="button" class="btn sk2" data-testid=${X.newPage} @click=${t.createPage}>+ New page</button>`,()=>V),Wk=(e,t)=>B`${Hk(e,t)}${Uk(e,t)}`,Gk=(e,t)=>I(e.offerToday,()=>B`
   <p class="offer sk2">
     <span>No page for today in ${e.title} yet.</span>
     <button type="button" class="btn sk start" data-testid=${X.startToday} @click=${t.createPage}>Start today’s page</button>
-  </p>`,()=>V),zk=(e,t)=>B`
+  </p>`,()=>V),Kk=(e,t)=>B`
   <header data-testid=${X.header}>
-    <button type="button" class="ico" aria-label="Open projects and pages menu" data-testid=${X.menuButton} @click=${t.openMenu}>${Pk}</button>
+    <button type="button" class="ico" aria-label="Open projects and pages menu" data-testid=${X.menuButton} @click=${t.openMenu}>${Vk}</button>
     <hgroup>
       <h1 class="head title" data-testid=${X.title}>${e.title}</h1>
       <p class="muted date" data-testid=${X.dateLine}>${e.dateLine}</p>
     </hgroup>
     ${I(e.closed,()=>B`<span class="closed sk2" data-testid=${X.dayClosed}>Day closed</span>`,()=>V)}
     <tt-sync-badge></tt-sync-badge>
-    ${Lk(e,t)}
+    ${Wk(e,t)}
     <tt-end-day-button></tt-end-day-button>
   </header>
-  ${Rk(e,t)}
-`,Bk=(e,t)=>({openMenu:()=>{globalThis.dispatchEvent(new CustomEvent(`tt:open-menu`))},createPage:()=>{C(T(t),{onNone:()=>void 0,onSome:t=>{let n=e.now();e.store.dispatch({type:`pages/created`,at:n,id:e.newId(),projectId:t,date:e.today(n)})}})},openPage:t=>{e.store.dispatch({type:`pages/opened`,at:e.now(),id:t})}}),Vk=z`
+  ${Gk(e,t)}
+`,qk=(e,t)=>({openMenu:()=>{globalThis.dispatchEvent(new CustomEvent(`tt:open-menu`))},createPage:()=>{C(T(t),{onNone:()=>void 0,onSome:t=>{let n=e.now();e.store.dispatch({type:`pages/created`,at:n,id:e.newId(),projectId:t,date:e.today(n)})}})},openPage:t=>{e.store.dispatch({type:`pages/opened`,at:e.now(),id:t})}}),Jk=z`
   :host { display: flex; flex-direction: column; gap: 12px; }
   header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
   hgroup { display: flex; flex-direction: column; gap: 2px; line-height: 1; flex: 1 1 220px; min-width: 0; margin: 0; }
@@ -1075,9 +1078,9 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
     /* FS-6.1: in landscape "End day" sits at the bottom of the rail (app layout slot), not in the header. */
     tt-end-day-button { display: none; }
   }
-`,Hk=class extends H{constructor(...e){super(...e),this.link=W(this)}static{this.styles=[U,Vk]}render(){return G(this.link)((e,t)=>zk(Nk(e,t.today(e.now)),Bk(t,e.pages.currentProjectId)))}};customElements.define(`tt-page-header`,Hk);var Uk=e=>{let t=Object.values(e.pages.byId);return e.pages.projects.map(n=>({id:n,name:Ek(e.catalog,n),pageCount:t.filter(e=>e.projectId===n).length,current:n===e.pages.currentProjectId}))},Wk=e=>Object.values(e.catalog.projects).filter(t=>!t.isArchived&&!t.isInbox&&!e.pages.projects.includes(t.id)).toSorted((e,t)=>e.childOrder-t.childOrder).map(e=>({id:e.id,name:e.name})),Gk=(e,t)=>Object.values(e).filter(e=>e.pageId===t).reduce((e,t)=>e+OT(t),0),Kk=(e,t)=>new Set(Object.values(e.log.entries).filter(e=>e.pageId===t).map(e=>e.taskId)).values().filter(t=>e.catalog.tasks[t]?.checked??!1).toArray().length,qk=40,Jk=e=>{switch(e.kind){case`text`:return e.text;case`sketch`:return e.alt}},Yk=e=>I(e.length>qk,()=>`${e.slice(0,qk).trimEnd()}…`,()=>e),Xk=e=>e.stickers.slice(0,1).map(e=>Yk(Jk(e)))[0],Zk=(e,t)=>Ep(e.pages,t).map(t=>({id:t.id,date:t.date,loggedMinutes:Gk(e.log.entries,t.id),doneCount:Kk(e,t.id),preview:Xk(t),current:t.id===e.pages.currentPageId})),Qk=e=>{let t=Ok(e,{weekday:`short`,day:`numeric`,month:`short`});return`${t.weekday??``} ${t.day??``} ${t.month??``}`},$k=e=>I(e>=60,()=>`${String(Math.floor(e/60))}h ${String(e%60).padStart(2,`0`)}`,()=>`${String(e)}m`),eA=e=>({id:e.id,dateLabel:Qk(e.date),totalLabel:$k(e.loggedMinutes),doneLabel:`${String(e.doneCount)} done`,preview:e.preview,current:e.current}),tA=e=>({projects:Uk(e),pages:T(e.pages.currentProjectId).pipe(D(t=>Zk(e,t).map(eA)),w(()=>[])),addable:Wk(e),canRemove:e.pages.projects.length>1}),nA=(e,t,n,r)=>I(e.canRemove,()=>B`
+`,Yk=class extends H{constructor(...e){super(...e),this.link=W(this)}static{this.styles=[U,Jk]}render(){return G(this.link)((e,t)=>Kk(Bk(e,t.today(e.now)),qk(t,e.pages.currentProjectId)))}};customElements.define(`tt-page-header`,Yk);var Xk=e=>{let t=Object.values(e.pages.byId);return e.pages.projects.map(n=>({id:n,name:Nk(e.catalog,n),pageCount:t.filter(e=>e.projectId===n).length,current:n===e.pages.currentProjectId}))},Zk=e=>Object.values(e.catalog.projects).filter(t=>!t.isArchived&&!t.isInbox&&!e.pages.projects.includes(t.id)).toSorted((e,t)=>e.childOrder-t.childOrder).map(e=>({id:e.id,name:e.name})),Qk=(e,t)=>Object.values(e).filter(e=>e.pageId===t).reduce((e,t)=>e+OT(t),0),$k=(e,t)=>new Set(Object.values(e.log.entries).filter(e=>e.pageId===t).map(e=>e.taskId)).values().filter(t=>e.catalog.tasks[t]?.checked??!1).toArray().length,eA=40,tA=e=>{switch(e.kind){case`text`:return e.text;case`sketch`:return e.alt}},nA=e=>I(e.length>eA,()=>`${e.slice(0,eA).trimEnd()}…`,()=>e),rA=e=>e.stickers.slice(0,1).map(e=>nA(tA(e)))[0],iA=(e,t)=>Ep(e.pages,t).map(t=>({id:t.id,date:t.date,loggedMinutes:Qk(e.log.entries,t.id),doneCount:$k(e,t.id),preview:rA(t),current:t.id===e.pages.currentPageId})),aA=e=>{let t=Fk(e,{weekday:`short`,day:`numeric`,month:`short`});return`${t.weekday??``} ${t.day??``} ${t.month??``}`},oA=e=>I(e>=60,()=>`${String(Math.floor(e/60))}h ${String(e%60).padStart(2,`0`)}`,()=>`${String(e)}m`),sA=e=>({id:e.id,dateLabel:aA(e.date),totalLabel:oA(e.loggedMinutes),doneLabel:`${String(e.doneCount)} done`,preview:e.preview,current:e.current}),cA=e=>({projects:Xk(e),pages:T(e.pages.currentProjectId).pipe(D(t=>iA(e,t).map(sA)),w(()=>[])),addable:Zk(e),canRemove:e.pages.projects.length>1}),lA=(e,t,n,r)=>I(e.canRemove,()=>B`
   <button type="button" class="ico remove" data-testid=${X.removeProject(n)} aria-label=${`Remove ${r} from the menu`}
-    @click=${()=>{t.removeProject(n)}}>×</button>`,()=>V),rA=(e,t)=>B`
+    @click=${()=>{t.removeProject(n)}}>×</button>`,()=>V),uA=(e,t)=>B`
   <ul class="projects" aria-label="Projects">
     ${e.projects.map(n=>B`
       <li class="project">
@@ -1085,58 +1088,58 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
           @click=${()=>{t.switchProject(n.id)}}>
           <span>${n.name}</span><span class="count">${n.pageCount} pages</span>
         </button>
-        ${nA(e,t,n.id,n.name)}
+        ${lA(e,t,n.id,n.name)}
       </li>`)}
   </ul>
-`,iA=(e,t)=>B`
+`,dA=(e,t)=>B`
   <form id="new-project" class="new-project sk card" @submit=${t.createProject}>
     <label for="new-project-name" class="new-label">New project name</label>
     <input id="new-project-name" class="inp sk" data-testid=${X.newProjectName} autocomplete="off" aria-describedby="new-project-hint"
       .value=${e} @input=${t.nameInput} @keydown=${t.nameKey}>
     <button type="submit" class="btn sk primary" data-testid=${X.createProject} aria-disabled=${String(e.trim().length===0)}>Create</button>
     <p id="new-project-hint" class="muted hint">Enter creates · Esc cancels</p>
-  </form>`,aA=(e,t)=>B`
+  </form>`,fA=(e,t)=>B`
   <button type="button" class="btn add" data-testid=${X.newProject} aria-expanded=${String(e.creating)} aria-controls="new-project"
     @click=${t.toggleCreating}>+ New project</button>
-  ${I(e.creating,()=>iA(e.newName,t),()=>V)}
-`,oA=(e,t)=>I(e.addable.length>0,()=>B`
+  ${I(e.creating,()=>dA(e.newName,t),()=>V)}
+`,pA=(e,t)=>I(e.addable.length>0,()=>B`
   <ul id="addable" class="addable" aria-label="Todoist projects to add">
     ${e.addable.map(e=>B`<li>
       <button type="button" class="btn pick" data-testid=${X.addable(e.id)} @click=${()=>{t.addProject(e.id)}}>+ ${e.name}</button>
     </li>`)}
-  </ul>`,()=>B`<p id="addable" class="muted hint">No more Todoist projects — connect Todoist in Settings to see yours.</p>`),sA=(e,t,n)=>B`
+  </ul>`,()=>B`<p id="addable" class="muted hint">No more Todoist projects — connect Todoist in Settings to see yours.</p>`),mA=(e,t,n)=>B`
   <button type="button" class="btn add" data-testid=${X.addProject} aria-expanded=${String(t)} aria-controls="addable"
     @click=${n.toggleAdding}>+ Add Todoist project</button>
-  ${I(t,()=>oA(e,n),()=>V)}
-`,cA=(e,t,n)=>B`
-  ${aA(t,n)}
-  ${I(t.todoist,()=>sA(e,t.adding,n),()=>V)}
-`,lA=e=>T(e.preview).pipe(C({onNone:()=>V,onSome:e=>B`<span class="preview">“${e}”</span>`})),uA=(e,t)=>B`
+  ${I(t,()=>pA(e,n),()=>V)}
+`,hA=(e,t,n)=>B`
+  ${fA(t,n)}
+  ${I(t.todoist,()=>mA(e,t.adding,n),()=>V)}
+`,gA=e=>T(e.preview).pipe(C({onNone:()=>V,onSome:e=>B`<span class="preview">“${e}”</span>`})),_A=(e,t)=>B`
   <ol class="pages" aria-labelledby="pages-title">
     ${e.map(e=>B`<li>
       <button type="button" class="row" data-testid=${X.pageRow} aria-current=${I(e.current,()=>`page`,()=>`false`)}
         @click=${()=>{t.openPage(e.id)}}>
-        <span>${e.dateLabel}</span><span class="muted">${e.totalLabel} · ${e.doneLabel}</span>${lA(e)}
+        <span>${e.dateLabel}</span><span class="muted">${e.totalLabel} · ${e.doneLabel}</span>${gA(e)}
       </button>
     </li>`)}
-  </ol>`,dA=(e,t)=>B`
+  </ol>`,vA=(e,t)=>B`
   <h3 id="pages-title" class="head section">Pages · newest first</h3>
-  ${I(e.length>0,()=>uA(e,t),()=>B`<p class="muted hint">No pages in this project yet.</p>`)}
-`,fA=B`<svg width="22" height="22" viewBox="0 0 22 22" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
-  aria-hidden="true"><path d="M4 4.5c5 4 9 8.5 14 13M18 4c-4 5-9 9-14 14"></path></svg>`,pA=(e,t,n)=>B`
+  ${I(e.length>0,()=>_A(e,t),()=>B`<p class="muted hint">No pages in this project yet.</p>`)}
+`,yA=B`<svg width="22" height="22" viewBox="0 0 22 22" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+  aria-hidden="true"><path d="M4 4.5c5 4 9 8.5 14 13M18 4c-4 5-9 9-14 14"></path></svg>`,bA=(e,t,n)=>B`
   <dialog data-testid=${X.menu} aria-labelledby="menu-title" @click=${n.closeOnBackdrop}>
     <nav class="sk2" aria-label="Projects and pages">
       <header class="top">
         <h2 id="menu-title" class="head menu-title">Projects</h2>
-        <button type="button" class="ico" aria-label="Close menu" data-testid=${X.menuClose} @click=${n.close}>${fA}</button>
+        <button type="button" class="ico" aria-label="Close menu" data-testid=${X.menuClose} @click=${n.close}>${yA}</button>
       </header>
-      ${rA(e,n)}
-      ${cA(e,t,n)}
-      ${dA(e.pages,n)}
+      ${uA(e,n)}
+      ${hA(e,t,n)}
+      ${vA(e.pages,n)}
       <button type="button" class="btn sk settings" data-testid=${X.settings} @click=${n.openSettings}>Settings</button>
     </nav>
   </dialog>
-`,mA=(e,t,n)=>D(A(e.trim(),e=>e.length>0),e=>({type:`catalog/projectCreated`,at:t,id:n,name:e})),hA=(e,t)=>{e.updateComplete.then(()=>{D(T(e.renderRoot.querySelector(`[data-testid="${t}"]`)),e=>{e.focus()})})},gA=e=>{e.creating=!1,e.newName=``},_A=(e,t)=>({toggleCreating:()=>{e.creating=!e.creating,e.newName=``,L(e.creating,()=>{hA(e,X.newProjectName)})},nameInput:t=>{D(A(t.currentTarget,e=>e instanceof HTMLInputElement),t=>{e.newName=t.value})},nameKey:t=>{L(t.key===`Escape`,()=>{t.preventDefault(),t.stopPropagation(),gA(e),hA(e,X.newProject)})},createProject:n=>{n.preventDefault(),D(mA(e.newName,t.now(),t.newId()),n=>{t.store.dispatch(n),gA(e),hA(e,X.newProject)})}}),vA=e=>{e.renderRoot.querySelectorAll(`dialog`).forEach(e=>{e.close()})},yA=(e,t)=>({..._A(e,t),close:()=>{vA(e)},closeOnBackdrop:t=>{e.renderRoot.querySelectorAll(`dialog`).forEach(e=>{[t.target].filter(t=>t===e).forEach(()=>{e.close()})})},toggleAdding:()=>{e.adding=!e.adding},switchProject:e=>{t.store.dispatch({type:`pages/projectSwitched`,at:t.now(),projectId:e})},addProject:n=>{t.store.dispatch({type:`pages/projectAdded`,at:t.now(),projectId:n}),e.adding=!1},removeProject:e=>{t.store.dispatch({type:`pages/projectRemoved`,at:t.now(),projectId:e})},openPage:n=>{t.store.dispatch({type:`pages/opened`,at:t.now(),id:n}),vA(e)},openSettings:()=>{vA(e),globalThis.dispatchEvent(new CustomEvent(`tt:open-settings`))}}),bA=e=>{let t=()=>{e.adding=!1,e.creating=!1,e.newName=``,e.renderRoot.querySelectorAll(`dialog`).forEach(e=>{e.showModal()})};return{connect:()=>{globalThis.addEventListener(`tt:open-menu`,t)},disconnect:()=>{globalThis.removeEventListener(`tt:open-menu`,t)}}},xA=z`
+`,xA=(e,t,n)=>D(A(e.trim(),e=>e.length>0),e=>({type:`catalog/projectCreated`,at:t,id:n,name:e})),SA=(e,t)=>{e.updateComplete.then(()=>{D(T(e.renderRoot.querySelector(`[data-testid="${t}"]`)),e=>{e.focus()})})},CA=e=>{e.creating=!1,e.newName=``},wA=(e,t)=>({toggleCreating:()=>{e.creating=!e.creating,e.newName=``,L(e.creating,()=>{SA(e,X.newProjectName)})},nameInput:t=>{D(A(t.currentTarget,e=>e instanceof HTMLInputElement),t=>{e.newName=t.value})},nameKey:t=>{L(t.key===`Escape`,()=>{t.preventDefault(),t.stopPropagation(),CA(e),SA(e,X.newProject)})},createProject:n=>{n.preventDefault(),D(xA(e.newName,t.now(),t.newId()),n=>{t.store.dispatch(n),CA(e),SA(e,X.newProject)})}}),TA=e=>{e.renderRoot.querySelectorAll(`dialog`).forEach(e=>{e.close()})},EA=(e,t)=>({...wA(e,t),close:()=>{TA(e)},closeOnBackdrop:t=>{e.renderRoot.querySelectorAll(`dialog`).forEach(e=>{[t.target].filter(t=>t===e).forEach(()=>{e.close()})})},toggleAdding:()=>{e.adding=!e.adding},switchProject:e=>{t.store.dispatch({type:`pages/projectSwitched`,at:t.now(),projectId:e})},addProject:n=>{t.store.dispatch({type:`pages/projectAdded`,at:t.now(),projectId:n}),e.adding=!1},removeProject:e=>{t.store.dispatch({type:`pages/projectRemoved`,at:t.now(),projectId:e})},openPage:n=>{t.store.dispatch({type:`pages/opened`,at:t.now(),id:n}),TA(e)},openSettings:()=>{TA(e),globalThis.dispatchEvent(new CustomEvent(`tt:open-settings`))}}),DA=e=>{let t=()=>{e.adding=!1,e.creating=!1,e.newName=``,e.renderRoot.querySelectorAll(`dialog`).forEach(e=>{e.showModal()})};return{connect:()=>{globalThis.addEventListener(`tt:open-menu`,t)},disconnect:()=>{globalThis.removeEventListener(`tt:open-menu`,t)}}},OA=z`
   dialog { margin: 0; inset: 0 auto 0 0; padding: 0; border: 0; background: transparent; color: inherit;
     width: min(370px, 92vw); max-width: none; height: 100dvh; max-height: none; }
   dialog::backdrop { background: color-mix(in srgb, var(--ink) 35%, transparent); }
@@ -1165,57 +1168,57 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
   .preview { flex-basis: 100%; font-size: 15px; background: var(--st-yellow); padding: 2px 8px; justify-self: start; width: fit-content; }
   .hint { margin: 0; font-size: 16px; }
   .settings { margin-top: auto; align-self: flex-start; }
-`,SA=class extends H{static{this.properties={adding:{state:!0},creating:{state:!0},newName:{state:!0}}}static{this.styles=[U,xA]}constructor(){super(),this.link=W(this),this.ctl=bA(this),this.adding=!1,this.creating=!1,this.newName=``}connectedCallback(){super.connectedCallback(),this.ctl.connect()}disconnectedCallback(){super.disconnectedCallback(),this.ctl.disconnect()}render(){return G(this.link)((e,t)=>pA(tA(e),{todoist:t.integrations.todoist,adding:this.adding,creating:this.creating,newName:this.newName},yA(this,t)))}};customElements.define(`tt-project-menu`,SA);var CA={open:!1,typing:!1,query:``,expanded:new Set,focusId:void 0,notice:``,form:void 0,editId:void 0,editReturn:b()},Z=(e,t)=>{let n={...e.ui,...t};e.ui={...n,typing:n.typing&&n.open}},wA=(e,t)=>{e.updateComplete.then(()=>{e.renderRoot.querySelector(t)?.focus()})},TA=`#tt-picker-input`,EA={focusRow:(e,t)=>{Z(e,{focusId:t}),wA(e,`[data-row-id="${CSS.escape(t)}"]`)},setExpanded:(e,t,n)=>{Z(e,{expanded:new Set([...e.ui.expanded].filter(e=>e!==t).concat([t].filter(()=>n)))})},close:e=>{Z(e,{open:!1}),wA(e,TA)},openForm:(e,t)=>{Z(e,{form:t,open:!1})},openEdit:(e,t)=>{Z(e,{editId:t,editReturn:b(),open:!1})},focusInput:e=>{wA(e,TA)}},DA=e=>O(E(e.pages.currentPageId),t=>T(e.pages.byId[t])),OA=(e,t)=>[{status:`active`,hit:e?.active.some(e=>e.taskId===t)??!1},{status:`queued`,hit:e?.queue.includes(t)??!1}].find(e=>e.hit)?.status??`none`,kA=(e,t)=>n=>{let r=t.store.getState();C(DA(r),{onNone:()=>void 0,onSome:i=>{let a=r.catalog.tasks[n]?.content??n,o=OA(i,n)!==`none`;L(o,()=>{globalThis.dispatchEvent(new CustomEvent(`tt:highlight-task`,{detail:n}))}),L(!o,()=>{t.store.dispatch({type:`pages/taskActivated`,at:t.now(),pageId:i.id,taskId:n})}),Z(e,{open:!1,query:``,focusId:void 0,notice:I(o,()=>`“${a}” is already in focus`,()=>`“${a}” added to focus`)})}})},AA={kind:`none`},jA=e=>e.find(e=>e.hit)?.command()??AA,MA=(e,t)=>C(E(e[t]),{onNone:()=>AA,onSome:e=>({kind:`focus`,id:e.id})}),NA=e=>(t,n)=>{let r=t[n];return jA([{hit:r?.kind===`task`,command:()=>({kind:e,id:r?.id??``})}])},PA=(e,t)=>{let n=e[t],r=n?.kind===`section`||n?.kind===`task`&&n.expanded,i=(e[t+1]?.level??0)>(n?.level??0);return jA([{hit:n?.kind===`task`&&n.expandable&&!n.expanded,command:()=>({kind:`expand`,id:n?.id??``})},{hit:r&&i,command:()=>MA(e,t+1)}])},FA=(e,t)=>{let n=e[t],r=e.slice(0,t).findLastIndex(e=>e.level===(n?.level??0)-1);return jA([{hit:n?.kind===`task`&&n.expanded,command:()=>({kind:`collapse`,id:n?.id??``})},{hit:r>=0,command:()=>MA(e,r)}])},IA=e=>(t,n)=>{let r=ET(e);return MA(t,t.map((e,r)=>(n+1+r)%t.length).find(e=>ET(t[e]?.title??``).startsWith(r))??-1)},LA=new Map([[`ArrowDown`,(e,t)=>MA(e,Math.min(t+1,e.length-1))],[`ArrowUp`,(e,t)=>MA(e,Math.max(t-1,0))],[`Home`,e=>MA(e,0)],[`End`,e=>MA(e,e.length-1)],[`ArrowRight`,PA],[`ArrowLeft`,FA],[`Enter`,NA(`pick`)],[`F2`,NA(`edit`)],[`+`,NA(`subtask`)],[`Escape`,()=>({kind:`close`})]]),RA=e=>LA.get(e)??I(/^\S$/u.test(e),()=>IA(e),()=>()=>AA),zA=(e,t,n)=>RA(n)(e,Math.max(0,e.findIndex(e=>e.id===t))),BA=e=>(t,n,r)=>t.flatMap((t,i)=>{let a=t.children.length>0,o=a&&e(t.task.id),s=t.children.filter(()=>o);return[{kind:`task`,id:t.task.id,title:t.task.content,task:t.task,level:n,setsize:r,posinset:i+1,expandable:a,expanded:o,subtasks:t.subtasks},...BA(e)(s,n+1,s.length)]}),VA=(e,t)=>{let n=BA(t),r=e.find(e=>e.section===void 0)?.nodes??[],i=e.flatMap(e=>$n(E(e.section)).map(t=>({section:t,variant:e.variant,nodes:e.nodes}))),a=r.length+i.length;return[...n(r,1,a),...i.flatMap(({section:e,variant:t,nodes:i},o)=>[{kind:`section`,variant:t,id:`section:${e.id}`,title:e.name,level:1,setsize:a,posinset:r.length+o+1},...n(i,2,i.length)])]},HA={1:`P1 · urgent`,2:`P2 · high`,3:`P3 · medium`,4:`P4 · none`},UA=(e,t)=>{let n=new Set([t,Hm,...$n(E(e.sync.inboxProjectId))]);return Object.values(e.catalog.tasks).filter(e=>n.has(e.projectId)&&!e.checked)},WA=(e,t,n)=>{let r=UA(e,t),i=ET(n.trim()),a=r.filter(e=>ET(e.content).includes(i)).map(e=>e.id),o=e=>r.filter(t=>t.parentId===e).length;return BC(e.catalog,a).filter(e=>i===``||e.ids.length>0).map(({priority:n,ids:r})=>({section:{id:`p${String(n)}`,projectId:t,name:`${HA[n]} · ${String(r.length)}`,sectionOrder:n},variant:`priority`,nodes:r.flatMap(t=>$n(E(e.catalog.tasks[t]))).map(e=>({task:e,children:[],subtasks:o(e.id)}))}))},GA=e=>Object.values(e).reduce((e,t)=>new Map(e).set(t.taskId,(e.get(t.taskId)??0)+OT(t)),new Map),KA=e=>{let t=Math.floor(e/60),n=e%60;return[...[`${String(t)}h`].filter(()=>t>0),...[`${String(n).padStart(1+Number(t>0),`0`)}m`].filter(()=>n>0)].join(` `)},qA=(e,t,n)=>[e.map(e=>`@${e}`).join(` `),...[`${String(t)} subtask${`s`.repeat(Number(t!==1))}`].filter(()=>t>0),KA(n)].filter(e=>e.length>0).join(` · `),JA=(e,t,n)=>{let r=e.tasks[n];return[...[`Inbox`].filter(()=>r!==void 0&&r.projectId!==t.projectId),jC(e,n)].filter(e=>e.length>0).join(` › `)},YA=(e,t,n)=>r=>{switch(r.kind){case`section`:return r;case`task`:return{...r,meta:[JA(e,t,r.id),qA(r.task.labels,r.subtasks,n.get(r.id)??0)].filter(e=>e.length>0).join(` · `),status:OA(t,r.id)}}},XA=(e,t,n)=>C(DA(e),{onNone:()=>[],onSome:r=>VA(WA(e,r.projectId,t),e=>n.has(e)).map(YA(e.catalog,r,GA(e.log.entries)))}),ZA=(e,t,n)=>{switch(n.kind){case`focus`:EA.focusRow(e,n.id);break;case`expand`:EA.setExpanded(e,n.id,!0);break;case`collapse`:EA.setExpanded(e,n.id,!1);break;case`pick`:kA(e,t)(n.id),EA.focusInput(e);break;case`edit`:EA.openEdit(e,n.id);break;case`subtask`:EA.openForm(e,{title:``,parentId:n.id});break;case`close`:EA.close(e)}},QA=(e,t)=>n=>{let r=XA(t.store.getState(),e.ui.query,e.ui.expanded),i=I(n.ctrlKey||n.altKey||n.metaKey,()=>``,()=>n.key),a=zA(r,e.ui.focusId,i);L(a.kind!==`none`,()=>{n.preventDefault()}),ZA(e,t,a)},$A=/^[A-Za-z][A-Za-z0-9]+$/,ej=e=>A(e.key,t=>t.length>0&&!$A.test(t)&&!e.ctrlKey&&!e.altKey&&!e.metaKey),tj=(e,t)=>e&&!t,nj=new Map([[`ArrowDown`,(e,t)=>{Z(e,{open:!0,notice:``}),D(E(XA(t.store.getState(),e.ui.query,e.ui.expanded)[0]),t=>{EA.focusRow(e,t.id)})}],[`Escape`,e=>{Z(e,{open:!1})}],[`Enter`,e=>{L(e.ui.query.trim().length>0,()=>{EA.openForm(e,{title:e.ui.query.trim(),parentId:void 0})})}]]),rj=(e,t)=>{D(k(ej(t),()=>tj(e.coarse,e.ui.typing)),n=>{t.preventDefault(),Z(e,{open:!0,typing:!0,query:e.ui.query+n,notice:``,focusId:void 0})})},ij=(e,t)=>n=>{rj(e,n),D(E(nj.get(n.key)),r=>{n.preventDefault(),r(e,t)})},aj=e=>u(A(e.target,e=>e instanceof HTMLInputElement||e instanceof HTMLSelectElement),C({onNone:()=>``,onSome:e=>e.value})),oj=e=>({open:!0,typing:e}),sj=(e,t)=>{C(k(t,e=>e.isConnected),{onNone:()=>{EA.focusInput(e)},onSome:e=>{e.focus()}})},cj=(e,t)=>!(t.relatedTarget instanceof Node&&e.renderRoot.contains(t.relatedTarget)),lj=(e,t)=>({query:t=>{Z(e,{query:aj(t),open:!0,notice:``,focusId:void 0})},open:()=>{Z(e,{...oj(e.ui.open),notice:``})},press:()=>{L(e.ui.open,()=>{Z(e,{typing:!0})})},inputKey:ij(e,t),treeKey:QA(e,t),focusOut:t=>{L(e.ui.open&&cj(e,t),()=>{Z(e,{open:!1})})},rowFocus:t=>{L(e.ui.focusId!==t,()=>{Z(e,{focusId:t})})},pick:kA(e,t),toggle:t=>{EA.setExpanded(e,t,!e.ui.expanded.has(t))},subtask:t=>{EA.openForm(e,{title:``,parentId:t})},edit:t=>{EA.openEdit(e,t)},handleKey:sw(t,e.renderRoot),create:()=>{EA.openForm(e,{title:e.ui.query.trim(),parentId:void 0})},formClosed:t=>{Z(e,{form:void 0,query:I(t,()=>``,()=>e.ui.query)}),EA.focusInput(e)},editClosed:()=>{let t=e.ui.editReturn;Z(e,{editId:void 0,editReturn:b()}),sj(e,t)}}),uj=cf(bf({taskId:F})),dj=e=>{let t=t=>{A(t,e=>e instanceof CustomEvent).pipe(O(e=>uj(e.detail)),D(({taskId:t})=>{Z(e,{editId:t,editReturn:vE(),open:!1})}))};return{connect:()=>{globalThis.addEventListener(`tt:edit-task`,t)},disconnect:()=>{globalThis.removeEventListener(`tt:edit-task`,t)}}},fj=e=>u(DA(e),O(t=>T(e.catalog.projects[t.projectId])),C({onNone:()=>`this project`,onSome:e=>e.name})),pj=e=>{let t=e.trim();return I(t.length>0,()=>`Create task “${t}” and start`,()=>`Create a task or subtask…`)},mj=(e,t,n,r)=>{let i=XA(e,t,n);return{enabled:Yn(DA(e)),project:fj(e),rows:i,rovingId:(i.find(e=>e.id===r)??i[0])?.id,prompt:pj(t),empty:I(t.trim().length>0,()=>`No tasks match “${t.trim()}”`,()=>`No open tasks in this project yet`)}},hj=e=>e??V,gj=(e,t)=>I(e,t,()=>V),_j=(e,t)=>Zn(A(e,()=>t)),vj=(e,t)=>{let n=_j(0,e.id===t)??-1;switch(e.kind){case`section`:return{expanded:`true`,current:void 0,tabindex:n};case`task`:return{expanded:_j(String(e.expanded),e.expandable),current:_j(`true`,e.status===`active`),tabindex:n}}},yj=e=>t=>{t.stopPropagation(),e()},bj=e=>`var(--p${String(e)})`,xj=e=>B`
-  <svg class="flag" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style=${`--flag: ${bj(e)}`}>
+`,kA=class extends H{static{this.properties={adding:{state:!0},creating:{state:!0},newName:{state:!0}}}static{this.styles=[U,OA]}constructor(){super(),this.link=W(this),this.ctl=DA(this),this.adding=!1,this.creating=!1,this.newName=``}connectedCallback(){super.connectedCallback(),this.ctl.connect()}disconnectedCallback(){super.disconnectedCallback(),this.ctl.disconnect()}render(){return G(this.link)((e,t)=>bA(cA(e),{todoist:t.integrations.todoist,adding:this.adding,creating:this.creating,newName:this.newName},EA(this,t)))}};customElements.define(`tt-project-menu`,kA);var AA={open:!1,typing:!1,query:``,expanded:new Set,focusId:void 0,notice:``,form:void 0,editId:void 0,editReturn:b()},Z=(e,t)=>{let n={...e.ui,...t};e.ui={...n,typing:n.typing&&n.open}},jA=(e,t)=>{e.updateComplete.then(()=>{e.renderRoot.querySelector(t)?.focus()})},MA=`#tt-picker-input`,NA={focusRow:(e,t)=>{Z(e,{focusId:t}),jA(e,`[data-row-id="${CSS.escape(t)}"]`)},setExpanded:(e,t,n)=>{Z(e,{expanded:new Set([...e.ui.expanded].filter(e=>e!==t).concat([t].filter(()=>n)))})},close:e=>{Z(e,{open:!1}),jA(e,MA)},openForm:(e,t)=>{Z(e,{form:t,open:!1})},openEdit:(e,t)=>{Z(e,{editId:t,editReturn:b(),open:!1})},focusInput:e=>{jA(e,MA)}},PA=e=>O(E(e.pages.currentPageId),t=>T(e.pages.byId[t])),FA=(e,t)=>[{status:`active`,hit:e?.active.some(e=>e.taskId===t)??!1},{status:`queued`,hit:e?.queue.includes(t)??!1}].find(e=>e.hit)?.status??`none`,IA=(e,t)=>n=>{let r=t.store.getState();C(PA(r),{onNone:()=>void 0,onSome:i=>{let a=r.catalog.tasks[n]?.content??n,o=FA(i,n)!==`none`;L(o,()=>{globalThis.dispatchEvent(new CustomEvent(`tt:highlight-task`,{detail:n}))}),L(!o,()=>{t.store.dispatch({type:`pages/taskActivated`,at:t.now(),pageId:i.id,taskId:n})}),Z(e,{open:!1,query:``,focusId:void 0,notice:I(o,()=>`“${a}” is already in focus`,()=>`“${a}” added to focus`)})}})},LA={kind:`none`},RA=e=>e.find(e=>e.hit)?.command()??LA,zA=(e,t)=>C(E(e[t]),{onNone:()=>LA,onSome:e=>({kind:`focus`,id:e.id})}),BA=e=>(t,n)=>{let r=t[n];return RA([{hit:r?.kind===`task`,command:()=>({kind:e,id:r?.id??``})}])},VA=(e,t)=>{let n=e[t],r=n?.kind===`section`||n?.kind===`task`&&n.expanded,i=(e[t+1]?.level??0)>(n?.level??0);return RA([{hit:n?.kind===`task`&&n.expandable&&!n.expanded,command:()=>({kind:`expand`,id:n?.id??``})},{hit:r&&i,command:()=>zA(e,t+1)}])},HA=(e,t)=>{let n=e[t],r=e.slice(0,t).findLastIndex(e=>e.level===(n?.level??0)-1);return RA([{hit:n?.kind===`task`&&n.expanded,command:()=>({kind:`collapse`,id:n?.id??``})},{hit:r>=0,command:()=>zA(e,r)}])},UA=e=>(t,n)=>{let r=ET(e);return zA(t,t.map((e,r)=>(n+1+r)%t.length).find(e=>ET(t[e]?.title??``).startsWith(r))??-1)},WA=new Map([[`ArrowDown`,(e,t)=>zA(e,Math.min(t+1,e.length-1))],[`ArrowUp`,(e,t)=>zA(e,Math.max(t-1,0))],[`Home`,e=>zA(e,0)],[`End`,e=>zA(e,e.length-1)],[`ArrowRight`,VA],[`ArrowLeft`,HA],[`Enter`,BA(`pick`)],[`F2`,BA(`edit`)],[`+`,BA(`subtask`)],[`Escape`,()=>({kind:`close`})]]),GA=e=>WA.get(e)??I(/^\S$/u.test(e),()=>UA(e),()=>()=>LA),KA=(e,t,n)=>GA(n)(e,Math.max(0,e.findIndex(e=>e.id===t))),qA=e=>(t,n,r)=>t.flatMap((t,i)=>{let a=t.children.length>0,o=a&&e(t.task.id),s=t.children.filter(()=>o);return[{kind:`task`,id:t.task.id,title:t.task.content,task:t.task,level:n,setsize:r,posinset:i+1,expandable:a,expanded:o,subtasks:t.subtasks},...qA(e)(s,n+1,s.length)]}),JA=(e,t)=>{let n=qA(t),r=e.find(e=>e.section===void 0)?.nodes??[],i=e.flatMap(e=>$n(E(e.section)).map(t=>({section:t,variant:e.variant,nodes:e.nodes}))),a=r.length+i.length;return[...n(r,1,a),...i.flatMap(({section:e,variant:t,nodes:i},o)=>[{kind:`section`,variant:t,id:`section:${e.id}`,title:e.name,level:1,setsize:a,posinset:r.length+o+1},...n(i,2,i.length)])]},YA={1:`P1 · urgent`,2:`P2 · high`,3:`P3 · medium`,4:`P4 · none`},XA=(e,t)=>{let n=new Set([t,Hm,...$n(E(e.sync.inboxProjectId))]);return Object.values(e.catalog.tasks).filter(e=>n.has(e.projectId)&&!e.checked)},ZA=(e,t,n)=>{let r=XA(e,t),i=ET(n.trim()),a=r.filter(e=>ET(e.content).includes(i)).map(e=>e.id),o=e=>r.filter(t=>t.parentId===e).length;return BC(e.catalog,a).filter(e=>i===``||e.ids.length>0).map(({priority:n,ids:r})=>({section:{id:`p${String(n)}`,projectId:t,name:`${YA[n]} · ${String(r.length)}`,sectionOrder:n},variant:`priority`,nodes:r.flatMap(t=>$n(E(e.catalog.tasks[t]))).map(e=>({task:e,children:[],subtasks:o(e.id)}))}))},QA=e=>Object.values(e).reduce((e,t)=>new Map(e).set(t.taskId,(e.get(t.taskId)??0)+OT(t)),new Map),$A=e=>{let t=Math.floor(e/60),n=e%60;return[...[`${String(t)}h`].filter(()=>t>0),...[`${String(n).padStart(1+Number(t>0),`0`)}m`].filter(()=>n>0)].join(` `)},ej=(e,t,n)=>[e.map(e=>`@${e}`).join(` `),...[`${String(t)} subtask${`s`.repeat(Number(t!==1))}`].filter(()=>t>0),$A(n)].filter(e=>e.length>0).join(` · `),tj=(e,t,n)=>{let r=e.tasks[n];return[...[`Inbox`].filter(()=>r!==void 0&&r.projectId!==t.projectId),jC(e,n)].filter(e=>e.length>0).join(` › `)},nj=(e,t,n)=>r=>{switch(r.kind){case`section`:return r;case`task`:return{...r,meta:[tj(e,t,r.id),ej(r.task.labels,r.subtasks,n.get(r.id)??0)].filter(e=>e.length>0).join(` · `),status:FA(t,r.id)}}},rj=(e,t,n)=>C(PA(e),{onNone:()=>[],onSome:r=>JA(ZA(e,r.projectId,t),e=>n.has(e)).map(nj(e.catalog,r,QA(e.log.entries)))}),ij=(e,t,n)=>{switch(n.kind){case`focus`:NA.focusRow(e,n.id);break;case`expand`:NA.setExpanded(e,n.id,!0);break;case`collapse`:NA.setExpanded(e,n.id,!1);break;case`pick`:IA(e,t)(n.id),NA.focusInput(e);break;case`edit`:NA.openEdit(e,n.id);break;case`subtask`:NA.openForm(e,{title:``,parentId:n.id});break;case`close`:NA.close(e)}},aj=(e,t)=>n=>{let r=rj(t.store.getState(),e.ui.query,e.ui.expanded),i=I(n.ctrlKey||n.altKey||n.metaKey,()=>``,()=>n.key),a=KA(r,e.ui.focusId,i);L(a.kind!==`none`,()=>{n.preventDefault()}),ij(e,t,a)},oj=/^[A-Za-z][A-Za-z0-9]+$/,sj=e=>A(e.key,t=>t.length>0&&!oj.test(t)&&!e.ctrlKey&&!e.altKey&&!e.metaKey),cj=(e,t)=>e&&!t,lj=new Map([[`ArrowDown`,(e,t)=>{Z(e,{open:!0,notice:``}),D(E(rj(t.store.getState(),e.ui.query,e.ui.expanded)[0]),t=>{NA.focusRow(e,t.id)})}],[`Escape`,e=>{Z(e,{open:!1})}],[`Enter`,e=>{L(e.ui.query.trim().length>0,()=>{NA.openForm(e,{title:e.ui.query.trim(),parentId:void 0})})}]]),uj=(e,t)=>{D(k(sj(t),()=>cj(e.coarse,e.ui.typing)),n=>{t.preventDefault(),Z(e,{open:!0,typing:!0,query:e.ui.query+n,notice:``,focusId:void 0})})},dj=(e,t)=>n=>{uj(e,n),D(E(lj.get(n.key)),r=>{n.preventDefault(),r(e,t)})},fj=e=>u(A(e.target,e=>e instanceof HTMLInputElement||e instanceof HTMLSelectElement),C({onNone:()=>``,onSome:e=>e.value})),pj=e=>({open:!0,typing:e}),mj=(e,t)=>{C(k(t,e=>e.isConnected),{onNone:()=>{NA.focusInput(e)},onSome:e=>{e.focus()}})},hj=(e,t)=>!(t.relatedTarget instanceof Node&&e.renderRoot.contains(t.relatedTarget)),gj=(e,t)=>({query:t=>{Z(e,{query:fj(t),open:!0,notice:``,focusId:void 0})},open:()=>{Z(e,{...pj(e.ui.open),notice:``})},press:()=>{L(e.ui.open,()=>{Z(e,{typing:!0})})},inputKey:dj(e,t),treeKey:aj(e,t),focusOut:t=>{L(e.ui.open&&hj(e,t),()=>{Z(e,{open:!1})})},rowFocus:t=>{L(e.ui.focusId!==t,()=>{Z(e,{focusId:t})})},pick:IA(e,t),toggle:t=>{NA.setExpanded(e,t,!e.ui.expanded.has(t))},subtask:t=>{NA.openForm(e,{title:``,parentId:t})},edit:t=>{NA.openEdit(e,t)},handleKey:sw(t,e.renderRoot),create:()=>{NA.openForm(e,{title:e.ui.query.trim(),parentId:void 0})},formClosed:t=>{Z(e,{form:void 0,query:I(t,()=>``,()=>e.ui.query)}),NA.focusInput(e)},editClosed:()=>{let t=e.ui.editReturn;Z(e,{editId:void 0,editReturn:b()}),mj(e,t)}}),_j=cf(bf({taskId:F})),vj=e=>{let t=t=>{A(t,e=>e instanceof CustomEvent).pipe(O(e=>_j(e.detail)),D(({taskId:t})=>{Z(e,{editId:t,editReturn:TE(),open:!1})}))};return{connect:()=>{globalThis.addEventListener(`tt:edit-task`,t)},disconnect:()=>{globalThis.removeEventListener(`tt:edit-task`,t)}}},yj=e=>u(PA(e),O(t=>T(e.catalog.projects[t.projectId])),C({onNone:()=>`this project`,onSome:e=>e.name})),bj=e=>{let t=e.trim();return I(t.length>0,()=>`Create task “${t}” and start`,()=>`Create a task or subtask…`)},xj=(e,t,n,r)=>{let i=rj(e,t,n);return{enabled:Yn(PA(e)),project:yj(e),rows:i,rovingId:(i.find(e=>e.id===r)??i[0])?.id,prompt:bj(t),empty:I(t.trim().length>0,()=>`No tasks match “${t.trim()}”`,()=>`No open tasks in this project yet`)}},Sj=e=>e??V,Cj=(e,t)=>I(e,t,()=>V),wj=(e,t)=>Zn(A(e,()=>t)),Tj=(e,t)=>{let n=wj(0,e.id===t)??-1;switch(e.kind){case`section`:return{expanded:`true`,current:void 0,tabindex:n};case`task`:return{expanded:wj(String(e.expanded),e.expandable),current:wj(`true`,e.status===`active`),tabindex:n}}},Ej=e=>t=>{t.stopPropagation(),e()},Dj=e=>`var(--p${String(e)})`,Oj=e=>B`
+  <svg class="flag" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style=${`--flag: ${Dj(e)}`}>
     <path d="M3 2v13M3 2.5c3-1.2 5 1.2 9 0v6c-4 1.2-6-1.2-9 0" stroke-width="1.6" stroke-linejoin="round"></path>
-  </svg>`,Sj=(e,t,n,r)=>{let i=vj(e,n);return B`
+  </svg>`,kj=(e,t,n,r)=>{let i=Tj(e,n);return B`
     <li role="treeitem" class="row" data-testid=${q.row} data-row-id=${e.id} data-priority=${e.task.priority}
       data-drag-id=${e.id} data-drag-priority=${e.task.priority}
       aria-label=${e.title} aria-describedby=${`tt-meta-${String(t)}`} aria-level=${e.level} aria-setsize=${e.setsize}
-      aria-posinset=${e.posinset} aria-expanded=${hj(i.expanded)} aria-current=${hj(i.current)}
+      aria-posinset=${e.posinset} aria-expanded=${Sj(i.expanded)} aria-current=${Sj(i.current)}
       tabindex=${i.tabindex} style=${`--level: ${String(e.level)}`}
       @click=${()=>{r.pick(e.id)}} @focus=${()=>{r.rowFocus(e.id)}}>
       ${xw(e.title,r.handleKey(e.id))}
-      ${xj(e.task.priority)}
+      ${Oj(e.task.priority)}
       <span class="title">${e.title}</span>
       <span class="meta" id=${`tt-meta-${String(t)}`}><span class="vh">P${e.task.priority}. </span>${e.meta}</span>
-      ${gj(e.status!==`none`,()=>B`<span class="badge" data-testid=${q.status} data-status=${e.status}>${e.status}</span>`)}
-      ${gj(e.task.pending,()=>B`<span class="pending" data-testid=${q.pending}>not synced</span>`)}
+      ${Cj(e.status!==`none`,()=>B`<span class="badge" data-testid=${q.status} data-status=${e.status}>${e.status}</span>`)}
+      ${Cj(e.task.pending,()=>B`<span class="pending" data-testid=${q.pending}>not synced</span>`)}
       <button class="ico act" tabindex="-1" data-testid=${q.addSubtask} aria-label=${`Add a subtask to ${e.title}`}
-        @click=${yj(()=>{r.subtask(e.id)})}>+</button>
+        @click=${Ej(()=>{r.subtask(e.id)})}>+</button>
       <button class="ico act" tabindex="-1" data-testid=${q.edit} aria-label=${`Edit labels and priority of ${e.title}`}
-        @click=${yj(()=>{r.edit(e.id)})}>
+        @click=${Ej(()=>{r.edit(e.id)})}>
         <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 15l1-4 8-8 3 3-8 8-4 1zM10.5 4.5l3 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path></svg>
       </button>
-    </li>`},Cj={"section:p1":`1`,"section:p2":`2`,"section:p3":`3`,"section:p4":`4`},wj={section:{cls:`section head`,testid:void 0},inbox:{cls:`section head inbox`,testid:q.inboxHeading},priority:{cls:`section head prio`,testid:q.group}},Tj=(e,t)=>(n,r)=>{switch(n.kind){case`task`:return Sj(n,r,e.rovingId,t);case`section`:return B`
-      <li role="treeitem" class=${wj[n.variant].cls} data-testid=${hj(wj[n.variant].testid)}
-        data-drop-priority=${hj(Cj[n.id])} data-row-id=${n.id} aria-label=${n.title} aria-level=${n.level}
-        aria-setsize=${n.setsize} aria-posinset=${n.posinset} aria-expanded="true" tabindex=${vj(n,e.rovingId).tabindex}
-        @focus=${()=>{t.rowFocus(n.id)}}>${n.title}</li>`}},Ej=(e,t)=>B`
+    </li>`},Aj={"section:p1":`1`,"section:p2":`2`,"section:p3":`3`,"section:p4":`4`},jj={section:{cls:`section head`,testid:void 0},inbox:{cls:`section head inbox`,testid:q.inboxHeading},priority:{cls:`section head prio`,testid:q.group}},Mj=(e,t)=>(n,r)=>{switch(n.kind){case`task`:return kj(n,r,e.rovingId,t);case`section`:return B`
+      <li role="treeitem" class=${jj[n.variant].cls} data-testid=${Sj(jj[n.variant].testid)}
+        data-drop-priority=${Sj(Aj[n.id])} data-row-id=${n.id} aria-label=${n.title} aria-level=${n.level}
+        aria-setsize=${n.setsize} aria-posinset=${n.posinset} aria-expanded="true" tabindex=${Tj(n,e.rovingId).tabindex}
+        @focus=${()=>{t.rowFocus(n.id)}}>${n.title}</li>`}},Nj=(e,t)=>B`
   <ol role="tree" id="tt-task-tree" class="tree" data-drag-list data-testid=${q.tree} aria-label=${`Tasks of ${e.project}`} @keydown=${t.treeKey}>
-    ${dk(e.rows,e=>e.id,Tj(e,t))}
-  </ol>`,Dj=(e,t)=>B`
+    ${vk(e.rows,e=>e.id,Mj(e,t))}
+  </ol>`,Pj=(e,t)=>B`
   <section class="popup sk2" aria-label="Task picker" data-drag-scroll>
-    ${I(e.rows.length>0,()=>Ej(e,t),()=>B`<p class="empty muted">${e.empty}</p>`)}
+    ${I(e.rows.length>0,()=>Nj(e,t),()=>B`<p class="empty muted">${e.empty}</p>`)}
     <button class="create" data-testid=${q.create} @click=${t.create}>+ ${e.prompt}</button>
-  </section>`,Oj=`tt-picker-hint`,kj=(e,t,n,r)=>B`
+  </section>`,Fj=`tt-picker-hint`,Ij=(e,t,n,r)=>B`
   <label for="tt-picker-input" class="vh">Pick or create a task</label>
   <section class="combo" @focusout=${n.focusOut}>
     <span class="field">
     <input id="tt-picker-input" class="inp sk" data-testid=${q.input} role="combobox" autocomplete="off"
       aria-expanded=${String(t.open&&e.enabled)} aria-controls="tt-task-tree" aria-haspopup="tree" aria-autocomplete="list"
-      aria-describedby=${hj(Zn(A(Oj,()=>!e.enabled)))}
+      aria-describedby=${Sj(Zn(A(Fj,()=>!e.enabled)))}
       placeholder="Pick a task or type a new one…" .value=${t.query} ?disabled=${!e.enabled}
       ?readonly=${r} @input=${n.query} @pointerdown=${n.press} @click=${n.open} @keydown=${n.inputKey}>
     <button type="button" class="quick btn sk" aria-label="New task" data-testid=${q.quickCreate} ?disabled=${!e.enabled}
       @click=${n.create}><span aria-hidden="true">+</span></button>
     </span>
-    ${gj(t.open&&e.enabled,()=>Dj(e,n))}
+    ${Cj(t.open&&e.enabled,()=>Pj(e,n))}
   </section>
-  ${gj(!e.enabled,()=>B`<p id=${Oj} class="hint muted" data-testid=${q.hint}>Start today's page first</p>`)}
+  ${Cj(!e.enabled,()=>B`<p id=${Fj} class="hint muted" data-testid=${q.hint}>Start today's page first</p>`)}
   <p class="notice" role="status" data-testid=${q.notice}>${t.notice}</p>
   <tt-task-form .request=${t.form} .onClose=${n.formClosed}></tt-task-form>
-  <tt-task-edit .taskId=${t.editId} .onClose=${n.editClosed}></tt-task-edit>`,Aj=z`
+  <tt-task-edit .taskId=${t.editId} .onClose=${n.editClosed}></tt-task-edit>`,Lj=z`
   :host { display: block; }
   .combo { position: relative; }
   .field { display: flex; gap: 8px; align-items: stretch; }
@@ -1255,13 +1258,13 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
     color: var(--break); cursor: pointer; border-radius: 0 0 8px 8px; }
   @media (hover: hover) { .create:hover { background: var(--hover); } }
   @media (hover: none) { .act { opacity: 1; } }
-`,jj=()=>globalThis.matchMedia(`(pointer: coarse)`).matches,Mj=e=>({title:e.title,parentId:e.parentId,sectionId:void 0,priority:4,labels:[],addToFocus:!0}),Nj=e=>t=>C(T(e[t?.parentId??``]),{onNone:()=>0,onSome:t=>1+Nj(e)(t)}),Pj=e=>C(DA(e),{onNone:()=>[],onSome:t=>VA(nh(e.catalog,t.projectId),()=>!0).flatMap(t=>{switch(t.kind){case`section`:return[];case`task`:return[{id:t.id,label:`${`· `.repeat(Nj(e.catalog.tasks)(t.task))}${t.title}`,sectionId:t.task.sectionId}]}})}),Fj=(e,t)=>{let n=Zn(D(DA(e),e=>e.projectId));return{draft:t,heading:I(t.parentId===void 0,()=>`New task`,()=>`New subtask`),parents:Pj(e),sections:Object.values(e.catalog.sections).filter(e=>e.projectId===n).toSorted(eh(e=>e.sectionOrder))}},Ij=(e,t,n,r,i)=>{let a=n.find(t=>t.id===e.parentId);return D(A(e.title.trim(),e=>e.length>0),n=>({type:`catalog/taskCreated`,at:i,tempId:`tmp-${r}`,uuid:r,projectId:t.projectId,parentId:a?.id,sectionId:w(D(E(a),e=>e.sectionId),()=>e.sectionId),content:n,priority:e.priority,labels:e.labels,pageId:Zn(A(t.id,()=>e.addToFocus))}))},Lj=e=>Zn(A(e,e=>e.length>0)),Rj=e=>e.target instanceof HTMLInputElement&&e.target.checked,zj=(e,t)=>{let n=t=>{e.draft={...e.draft,...t}};return{title:e=>{n({title:aj(e)})},parent:e=>{n({parentId:Lj(aj(e))})},section:e=>{n({sectionId:Lj(aj(e))})},priority:e=>{n({priority:e})},labels:e=>{n({labels:e})},addToFocus:e=>{n({addToFocus:Rj(e)})},cancel:()=>{e.onClose(!1)},submit:n=>{n.preventDefault();let r=t.store.getState(),i=t.newId();D(O(DA(r),n=>Ij(e.draft,n,Pj(r),i,t.now())),n=>{t.store.dispatch(n),e.onClose(!0)})}}},Bj=(e,t)=>{D(T(e.querySelector(`dialog`)),e=>{L(t&&!e.open,()=>{e.showModal()}),L(!t&&e.open,()=>{e.close()})})},Vj=[1,2,3,4],Hj=(e,t)=>B`
+`,Rj=()=>globalThis.matchMedia(`(pointer: coarse)`).matches,zj=e=>({title:e.title,parentId:e.parentId,sectionId:void 0,priority:4,labels:[],addToFocus:!0}),Bj=e=>t=>C(T(e[t?.parentId??``]),{onNone:()=>0,onSome:t=>1+Bj(e)(t)}),Vj=e=>C(PA(e),{onNone:()=>[],onSome:t=>JA(nh(e.catalog,t.projectId),()=>!0).flatMap(t=>{switch(t.kind){case`section`:return[];case`task`:return[{id:t.id,label:`${`· `.repeat(Bj(e.catalog.tasks)(t.task))}${t.title}`,sectionId:t.task.sectionId}]}})}),Hj=(e,t)=>{let n=Zn(D(PA(e),e=>e.projectId));return{draft:t,heading:I(t.parentId===void 0,()=>`New task`,()=>`New subtask`),parents:Vj(e),sections:Object.values(e.catalog.sections).filter(e=>e.projectId===n).toSorted(eh(e=>e.sectionOrder))}},Uj=(e,t,n,r,i)=>{let a=n.find(t=>t.id===e.parentId);return D(A(e.title.trim(),e=>e.length>0),n=>({type:`catalog/taskCreated`,at:i,tempId:`tmp-${r}`,uuid:r,projectId:t.projectId,parentId:a?.id,sectionId:w(D(E(a),e=>e.sectionId),()=>e.sectionId),content:n,priority:e.priority,labels:e.labels,pageId:Zn(A(t.id,()=>e.addToFocus))}))},Wj=e=>Zn(A(e,e=>e.length>0)),Gj=e=>e.target instanceof HTMLInputElement&&e.target.checked,Kj=(e,t)=>{let n=t=>{e.draft={...e.draft,...t}};return{title:e=>{n({title:fj(e)})},parent:e=>{n({parentId:Wj(fj(e))})},section:e=>{n({sectionId:Wj(fj(e))})},priority:e=>{n({priority:e})},labels:e=>{n({labels:e})},addToFocus:e=>{n({addToFocus:Gj(e)})},cancel:()=>{e.onClose(!1)},submit:n=>{n.preventDefault();let r=t.store.getState(),i=t.newId();D(O(PA(r),n=>Uj(e.draft,n,Vj(r),i,t.now())),n=>{t.store.dispatch(n),e.onClose(!0)})}}},qj=(e,t)=>{D(T(e.querySelector(`dialog`)),e=>{L(t&&!e.open,()=>{e.showModal()}),L(!t&&e.open,()=>{e.close()})})},Jj=[1,2,3,4],Yj=(e,t)=>B`
   <fieldset class="prio-set">
     <legend>Priority</legend>
-    ${Vj.map(n=>B`
+    ${Jj.map(n=>B`
       <button type="button" class="btn sk prio" data-testid=${q.priority} aria-pressed=${String(n===e)}
-        @click=${()=>{t(n)}}>${xj(n)}P${n}</button>`)}
-  </fieldset>`,Uj=(e,t)=>B`
+        @click=${()=>{t(n)}}>${Oj(n)}P${n}</button>`)}
+  </fieldset>`,Xj=(e,t)=>B`
   <label class="field">Inside task
     <select class="inp sk" data-testid=${q.formParent} @change=${t.parent}>
       <option value="" ?selected=${e.draft.parentId===void 0}>— top level —</option>
@@ -1273,15 +1276,15 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
       <option value="" ?selected=${e.draft.sectionId===void 0}>No section</option>
       ${e.sections.map(t=>B`<option value=${t.id} ?selected=${t.id===e.draft.sectionId}>${t.name}</option>`)}
     </select>
-  </label>`,Wj=(e,t,n)=>B`
+  </label>`,Zj=(e,t,n)=>B`
   <dialog class="sk2" data-testid=${q.form} aria-labelledby="tt-form-heading" @close=${n}>
     <form class="body" @submit=${t.submit}>
       <h2 id="tt-form-heading" class="head">${e.heading}</h2>
       <label class="field">Title
         <input class="inp sk" data-testid=${q.formTitle} required autocomplete="off" .value=${e.draft.title} @input=${t.title}>
       </label>
-      ${Uj(e,t)}
-      ${Hj(e.draft.priority,t.priority)}
+      ${Xj(e,t)}
+      ${Yj(e.draft.priority,t.priority)}
       <tt-label-field .selected=${e.draft.labels} .onChange=${t.labels}></tt-label-field>
       <label class="check">
         <input type="checkbox" data-testid=${q.formFocus} .checked=${e.draft.addToFocus} @change=${t.addToFocus}>
@@ -1292,7 +1295,7 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
         <button type="submit" class="btn sk primary" data-testid=${q.formSubmit}>Create task</button>
       </footer>
     </form>
-  </dialog>`,Gj=z`
+  </dialog>`,Qj=z`
   dialog { width: min(520px, calc(100vw - 24px)); box-sizing: border-box; padding: 18px 20px; background: var(--card); color: var(--ink);
     box-shadow: var(--shadow); max-height: calc(100dvh - 24px); overflow: auto; }
   dialog::backdrop { background: rgb(35 34 43 / 35%); }
@@ -1311,7 +1314,7 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
   footer { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
   .primary { background: var(--ink); color: var(--card); }
   @media (hover: hover) { .primary:hover { background: var(--ink-soft); } }
-`,Kj=8,qj=(e,t,n)=>{let r=ET(t.trim()),i=new Set(n.map(ET));return DT(e).filter(e=>!i.has(ET(e))&&ET(e).includes(r)).slice(0,Kj)},Jj=(e,t)=>{let n=t.trim(),r=[...e.activityLabels,...Object.values(e.labels).map(e=>e.name)].map(e=>e.toLowerCase());return A(n,e=>e.length>0&&!r.includes(e.toLowerCase()))},Yj=(e,t)=>{let n=t=>{e.text=``,e.onChange([...e.selected,t])},r=e=>{let r=t.newId();t.store.dispatch({type:`catalog/labelCreated`,at:t.now(),tempId:`tmp-${r}`,uuid:r,name:e}),n(e)};return{text:t=>{e.text=aj(t)},remove:t=>{e.onChange(e.selected.filter(e=>e!==t))},add:n,create:r,enter:i=>{let a=t.store.getState().catalog,o=e.text.trim().length>0;D(A(i,e=>e.key===`Enter`&&o),t=>{t.preventDefault(),C(Jj(a,e.text),{onSome:r,onNone:()=>{D(E(qj(a,e.text,e.selected)[0]),n)}})})}}},Xj=(e,t)=>B`
+`,$j=8,eM=(e,t,n)=>{let r=ET(t.trim()),i=new Set(n.map(ET));return DT(e).filter(e=>!i.has(ET(e))&&ET(e).includes(r)).slice(0,$j)},tM=(e,t)=>{let n=t.trim(),r=[...e.activityLabels,...Object.values(e.labels).map(e=>e.name)].map(e=>e.toLowerCase());return A(n,e=>e.length>0&&!r.includes(e.toLowerCase()))},nM=(e,t)=>{let n=t=>{e.text=``,e.onChange([...e.selected,t])},r=e=>{let r=t.newId();t.store.dispatch({type:`catalog/labelCreated`,at:t.now(),tempId:`tmp-${r}`,uuid:r,name:e}),n(e)};return{text:t=>{e.text=fj(t)},remove:t=>{e.onChange(e.selected.filter(e=>e!==t))},add:n,create:r,enter:i=>{let a=t.store.getState().catalog,o=e.text.trim().length>0;D(A(i,e=>e.key===`Enter`&&o),t=>{t.preventDefault(),C(tM(a,e.text),{onSome:r,onNone:()=>{D(E(eM(a,e.text,e.selected)[0]),n)}})})}}},rM=(e,t)=>B`
   <fieldset>
     <legend>Labels</legend>
     <ul class="chosen" aria-label="Chosen labels">
@@ -1327,7 +1330,7 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
       ${C(e.creatable,{onNone:()=>V,onSome:e=>B`<li><button type="button" class="opt new" data-testid=${q.labelCreate}
           @click=${()=>{t.create(e)}}>+ Create label “${e}”</button></li>`})}
     </ul>
-  </fieldset>`,Zj=z`
+  </fieldset>`,iM=z`
   :host { display: block; }
   fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
   legend { font-size: 16px; color: var(--ink-soft); padding: 0; margin-bottom: 6px; }
@@ -1339,22 +1342,22 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
     background: var(--card); color: var(--ink); cursor: pointer; }
   @media (hover: hover) { .opt:hover { background: var(--hover); } }
   .opt.new { color: var(--break); border-style: dashed; }
-`,Qj=class extends H{static{this.properties={selected:{attribute:!1},onChange:{attribute:!1},text:{state:!0}}}static{this.styles=[U,Zj]}constructor(){super(),this.link=W(this),this.selected=[],this.onChange=()=>void 0,this.text=``}render(){return G(this.link)((e,t)=>Xj({selected:this.selected,text:this.text,suggestions:qj(e.catalog,this.text,this.selected),creatable:Jj(e.catalog,this.text)},Yj(this,t)))}};customElements.define(`tt-label-field`,Qj);var $j=class extends H{static{this.properties={request:{attribute:!1},onClose:{attribute:!1},draft:{state:!0}}}static{this.styles=[U,Gj]}constructor(){super(),this.link=W(this),this.request=void 0,this.onClose=()=>void 0,this.draft=Mj({title:``,parentId:void 0})}willUpdate(e){L(e.has(`request`),()=>{D(E(this.request),e=>{this.draft=Mj(e)})})}updated(){Bj(this.renderRoot,this.request!==void 0)}render(){return G(this.link)((e,t)=>Wj(Fj(e,this.draft),zj(this,t),()=>{L(this.request!==void 0,()=>{this.onClose(!1)})}))}};customElements.define(`tt-task-form`,$j);var eM=(e,t)=>({priority:e=>n=>{L(n!==e.priority,()=>{t.store.dispatch({type:`catalog/priorityChanged`,at:t.now(),taskId:e.id,priority:n,uuid:t.newId()})})},labels:e=>n=>{t.store.dispatch({type:`catalog/labelsChanged`,at:t.now(),taskId:e.id,labels:n,uuid:t.newId()})},done:()=>{L(e.taskId!==void 0,e.onClose)}}),tM=(e,t)=>B`
+`,aM=class extends H{static{this.properties={selected:{attribute:!1},onChange:{attribute:!1},text:{state:!0}}}static{this.styles=[U,iM]}constructor(){super(),this.link=W(this),this.selected=[],this.onChange=()=>void 0,this.text=``}render(){return G(this.link)((e,t)=>rM({selected:this.selected,text:this.text,suggestions:eM(e.catalog,this.text,this.selected),creatable:tM(e.catalog,this.text)},nM(this,t)))}};customElements.define(`tt-label-field`,aM);var oM=class extends H{static{this.properties={request:{attribute:!1},onClose:{attribute:!1},draft:{state:!0}}}static{this.styles=[U,Qj]}constructor(){super(),this.link=W(this),this.request=void 0,this.onClose=()=>void 0,this.draft=zj({title:``,parentId:void 0})}willUpdate(e){L(e.has(`request`),()=>{D(E(this.request),e=>{this.draft=zj(e)})})}updated(){qj(this.renderRoot,this.request!==void 0)}render(){return G(this.link)((e,t)=>Zj(Hj(e,this.draft),Kj(this,t),()=>{L(this.request!==void 0,()=>{this.onClose(!1)})}))}};customElements.define(`tt-task-form`,oM);var sM=(e,t)=>({priority:e=>n=>{L(n!==e.priority,()=>{t.store.dispatch({type:`catalog/priorityChanged`,at:t.now(),taskId:e.id,priority:n,uuid:t.newId()})})},labels:e=>n=>{t.store.dispatch({type:`catalog/labelsChanged`,at:t.now(),taskId:e.id,labels:n,uuid:t.newId()})},done:()=>{L(e.taskId!==void 0,e.onClose)}}),cM=(e,t)=>B`
   <dialog class="sk2" data-testid=${q.editDialog} aria-labelledby="tt-edit-heading" @close=${t.done}>
     ${C(e,{onNone:()=>V,onSome:e=>B`
         <section class="body">
           <h2 id="tt-edit-heading" class="head">${e.content}</h2>
-          ${Hj(e.priority,t.priority(e))}
+          ${Yj(e.priority,t.priority(e))}
           <tt-label-field .selected=${e.labels} .onChange=${t.labels(e)}></tt-label-field>
           <footer><button type="button" class="btn sk primary" data-testid=${q.editDone} @click=${t.done}>Done</button></footer>
         </section>`})}
-  </dialog>`,nM=class extends H{static{this.properties={taskId:{attribute:!1},onClose:{attribute:!1}}}static{this.styles=[U,Gj]}constructor(){super(),this.link=W(this),this.taskId=void 0,this.onClose=()=>void 0}updated(){Bj(this.renderRoot,this.taskId!==void 0)}render(){return G(this.link)((e,t)=>tM(T(e.catalog.tasks[this.taskId??``]),eM(this,t)))}};customElements.define(`tt-task-edit`,nM);var rM=class extends H{static{this.properties={ui:{state:!0}}}static{this.styles=[U,Aj,Nw]}constructor(){super(),this.coarse=jj(),this.link=W(this),this.events=dj(this),this.drag=Yw(this),this.ui=CA}connectedCallback(){super.connectedCallback(),this.events.connect(),this.drag.connect()}disconnectedCallback(){super.disconnectedCallback(),this.events.disconnect(),this.drag.disconnect()}render(){return G(this.link)((e,t)=>kj(mj(e,this.ui.query,this.ui.expanded,this.ui.focusId),this.ui,lj(this,t),tj(this.coarse,this.ui.typing)))}};customElements.define(`tt-task-picker`,rM);var iM=(e,t)=>e.outbox.filter(e=>e.status===t).length,aM=[e=>e.connection===`disconnected`&&{kind:`local`,text:`local only`},e=>e.connection===`needsReconnect`&&{kind:`reconnect`,text:`reconnect Todoist`},e=>e.network===`offline`&&{kind:`offline`,text:`offline`},e=>iM(e,`failed`)>0&&{kind:`problem`,text:`sync problem`},e=>iM(e,`pending`)>0&&{kind:`pending`,text:`${String(iM(e,`pending`))} pending`}],oM=e=>aM.map(t=>t(e)).find(e=>e!==!1)||{kind:`synced`,text:`synced`},Q={badge:`sync-badge`,settings:`settings-dialog`,settingsClose:`settings-close`,notice:`settings-notice`,connection:`settings-connection`,connect:`settings-connect`,disconnect:`settings-disconnect`,todoistToggle:`settings-todoist-toggle`,problems:`sync-problems`,problem:e=>`sync-problem-${e}`,retry:e=>`sync-retry-${e}`,discard:e=>`sync-discard-${e}`,labelInput:`settings-label-input`,labelAdd:`settings-label-add`,label:e=>`settings-label-${e}`,labelRemove:e=>`settings-label-remove-${e}`,timerField:e=>`settings-timer-${e}`},sM=(e,t)=>B`
+  </dialog>`,lM=class extends H{static{this.properties={taskId:{attribute:!1},onClose:{attribute:!1}}}static{this.styles=[U,Qj]}constructor(){super(),this.link=W(this),this.taskId=void 0,this.onClose=()=>void 0}updated(){qj(this.renderRoot,this.taskId!==void 0)}render(){return G(this.link)((e,t)=>cM(T(e.catalog.tasks[this.taskId??``]),sM(this,t)))}};customElements.define(`tt-task-edit`,lM);var uM=class extends H{static{this.properties={ui:{state:!0}}}static{this.styles=[U,Lj,Nw]}constructor(){super(),this.coarse=Rj(),this.link=W(this),this.events=vj(this),this.drag=Yw(this),this.ui=AA}connectedCallback(){super.connectedCallback(),this.events.connect(),this.drag.connect()}disconnectedCallback(){super.disconnectedCallback(),this.events.disconnect(),this.drag.disconnect()}render(){return G(this.link)((e,t)=>Ij(xj(e,this.ui.query,this.ui.expanded,this.ui.focusId),this.ui,gj(this,t),cj(this.coarse,this.ui.typing)))}};customElements.define(`tt-task-picker`,uM);var dM=(e,t)=>e.outbox.filter(e=>e.status===t).length,fM=[e=>e.connection===`disconnected`&&{kind:`local`,text:`local only`},e=>e.connection===`needsReconnect`&&{kind:`reconnect`,text:`reconnect Todoist`},e=>e.network===`offline`&&{kind:`offline`,text:`offline`},e=>dM(e,`failed`)>0&&{kind:`problem`,text:`sync problem`},e=>dM(e,`pending`)>0&&{kind:`pending`,text:`${String(dM(e,`pending`))} pending`}],pM=e=>fM.map(t=>t(e)).find(e=>e!==!1)||{kind:`synced`,text:`synced`},Q={badge:`sync-badge`,settings:`settings-dialog`,settingsClose:`settings-close`,notice:`settings-notice`,connection:`settings-connection`,connect:`settings-connect`,disconnect:`settings-disconnect`,todoistToggle:`settings-todoist-toggle`,problems:`sync-problems`,problem:e=>`sync-problem-${e}`,retry:e=>`sync-retry-${e}`,discard:e=>`sync-discard-${e}`,labelInput:`settings-label-input`,labelAdd:`settings-label-add`,label:e=>`settings-label-${e}`,labelRemove:e=>`settings-label-remove-${e}`,timerField:e=>`settings-timer-${e}`},mM=(e,t)=>B`
   <button type="button" class="chip" data-testid=${Q.badge} data-kind=${e.kind}
     aria-label=${`Sync: ${e.text}. Open settings`} @click=${t}>
     <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5"></circle></svg>
     <span>${e.text}</span>
   </button>
-`,cM=z`
+`,hM=z`
   :host { display: inline-flex; }
   button { font: inherit; font-size: 16px; color: var(--ink); min-height: 44px; display: inline-flex; align-items: center; gap: 6px;
     cursor: pointer; padding: 2px 12px; }
@@ -1364,7 +1367,7 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
   [data-kind='pending'] circle { fill: var(--break); }
   [data-kind='problem'] circle, [data-kind='reconnect'] circle { fill: var(--warn); }
   [data-kind='problem'], [data-kind='reconnect'] { background: var(--warn-bg); }
-`,lM=class extends H{constructor(...e){super(...e),this.link=W(this)}static{this.styles=[U,cM]}render(){return G(this.link)((e,t)=>I(t.integrations.todoist,()=>sM(oM(e.sync),()=>{pv()}),()=>V))}};customElements.define(`tt-sync-badge`,lM);var uM=(e,t)=>[e.args[t]].filter(e=>typeof e==`string`)[0]??``,dM={item_add:e=>`Create task “${uM(e,`content`)}”`,item_close:()=>`Complete a task`,item_update:()=>`Update a task`,item_delete:()=>`Delete a task`,label_add:e=>`Create label “${uM(e,`name`)}”`,note_add:e=>`Post time comment “${uM(e,`content`)}”`,note_update:e=>`Update time comment “${uM(e,`content`)}”`,note_delete:()=>`Delete a time comment`},fM=e=>dM[e.type](e),pM=e=>({connection:e.sync.connection,todoistEnabled:e.sync.todoistEnabled,problems:e.sync.outbox.filter(e=>e.status===`failed`).map(e=>({uuid:e.command.uuid,text:fM(e.command),error:e.error??`Unknown error`})),labels:e.catalog.activityLabels,timer:{focusMs:e.timer.settings.focusMs/6e4,shortBreakMs:e.timer.settings.shortBreakMs/6e4,longBreakMs:e.timer.settings.longBreakMs/6e4,longBreakEvery:e.timer.settings.longBreakEvery}}),mM=(e,t,n)=>B`
+`,gM=class extends H{constructor(...e){super(...e),this.link=W(this)}static{this.styles=[U,hM]}render(){return G(this.link)((e,t)=>I(t.integrations.todoist,()=>mM(pM(e.sync),()=>{pv()}),()=>V))}};customElements.define(`tt-sync-badge`,gM);var _M=(e,t)=>[e.args[t]].filter(e=>typeof e==`string`)[0]??``,vM={item_add:e=>`Create task “${_M(e,`content`)}”`,item_close:()=>`Complete a task`,item_update:()=>`Update a task`,item_delete:()=>`Delete a task`,label_add:e=>`Create label “${_M(e,`name`)}”`,note_add:e=>`Post time comment “${_M(e,`content`)}”`,note_update:e=>`Update time comment “${_M(e,`content`)}”`,note_delete:()=>`Delete a time comment`},yM=e=>vM[e.type](e),bM=e=>({connection:e.sync.connection,todoistEnabled:e.sync.todoistEnabled,problems:e.sync.outbox.filter(e=>e.status===`failed`).map(e=>({uuid:e.command.uuid,text:yM(e.command),error:e.error??`Unknown error`})),labels:e.catalog.activityLabels,timer:{focusMs:e.timer.settings.focusMs/6e4,shortBreakMs:e.timer.settings.shortBreakMs/6e4,longBreakMs:e.timer.settings.longBreakMs/6e4,longBreakEvery:e.timer.settings.longBreakEvery}}),xM=(e,t,n)=>B`
   <dialog data-testid=${Q.settings} aria-labelledby="settings-title">
     <article class="sheet sk card">
       <header class="top">
@@ -1375,20 +1378,20 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
       ${t}
     </article>
   </dialog>
-`,hM=e=>B`<a class="btn sk" href="/api/oauth/start" data-testid=${Q.connect}>${e}</a>`,gM={connected:e=>B`
+`,SM=e=>B`<a class="btn sk" href="/api/oauth/start" data-testid=${Q.connect}>${e}</a>`,CM={connected:e=>B`
     <p data-testid=${Q.connection}>Connected to Todoist.</p>
     <button type="button" class="btn sk2" data-testid=${Q.disconnect} @click=${e.disconnect}>Disconnect</button>`,disconnected:()=>B`
-    <p data-testid=${Q.connection}>Not connected: tasks and time entries stay on this device.</p>${hM(`Connect Todoist`)}`,needsReconnect:()=>B`
-    <p data-testid=${Q.connection}>Todoist access expired. Queued changes are kept until you reconnect.</p>${hM(`Reconnect Todoist`)}`},_M=(e,t)=>B`
+    <p data-testid=${Q.connection}>Not connected: tasks and time entries stay on this device.</p>${SM(`Connect Todoist`)}`,needsReconnect:()=>B`
+    <p data-testid=${Q.connection}>Todoist access expired. Queued changes are kept until you reconnect.</p>${SM(`Reconnect Todoist`)}`},wM=(e,t)=>B`
   <section aria-labelledby="settings-todoist">
     <h3 id="settings-todoist" class="head">Todoist</h3>
-    ${gM[e.connection](t)}
+    ${CM[e.connection](t)}
     <label class="check">
       <input type="checkbox" data-testid=${Q.todoistToggle} .checked=${e.todoistEnabled} @change=${t.toggleTodoist}>
       Send changes to Todoist (new tasks, completions, labels, time comments)
     </label>
   </section>
-`,vM=(e,t)=>B`
+`,TM=(e,t)=>B`
   <li class="problem" data-testid=${Q.problem(e.uuid)}>
     <span>${e.text}</span>
     <span class="muted error">${e.error}</span>
@@ -1397,13 +1400,13 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
       <button type="button" class="btn sk2" data-testid=${Q.discard(e.uuid)} @click=${()=>{t.discard(e.uuid)}}>Discard</button>
     </span>
   </li>
-`,yM=(e,t)=>B`
+`,EM=(e,t)=>B`
   <section aria-labelledby="settings-problems">
     <h3 id="settings-problems" class="head">Sync problems</h3>
-    <ol class="problems" data-testid=${Q.problems}>${e.problems.map(e=>vM(e,t))}</ol>
+    <ol class="problems" data-testid=${Q.problems}>${e.problems.map(e=>TM(e,t))}</ol>
     <p class="muted" ?hidden=${e.problems.length>0}>No sync problems.</p>
   </section>
-`,bM=(e,t)=>B`
+`,DM=(e,t)=>B`
   <section aria-labelledby="settings-labels">
     <h3 id="settings-labels" class="head">Activity labels</h3>
     <ul class="chips">
@@ -1420,11 +1423,11 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
       <button type="submit" class="btn sk2" data-testid=${Q.labelAdd}>Add</button>
     </form>
   </section>
-`,xM=[{field:`focusMs`,label:`Focus, minutes`,max:240},{field:`shortBreakMs`,label:`Short break, minutes`,max:240},{field:`longBreakMs`,label:`Long break, minutes`,max:240},{field:`longBreakEvery`,label:`Long break every N focuses`,max:12}],SM=(e,t)=>B`
+`,OM=[{field:`focusMs`,label:`Focus, minutes`,max:240},{field:`shortBreakMs`,label:`Short break, minutes`,max:240},{field:`longBreakMs`,label:`Long break, minutes`,max:240},{field:`longBreakEvery`,label:`Long break every N focuses`,max:12}],kM=(e,t)=>B`
   <section aria-labelledby="settings-timer">
     <h3 id="settings-timer" class="head">Timer intervals</h3>
     <ul class="fields">
-      ${xM.map(({field:n,label:r,max:i})=>B`
+      ${OM.map(({field:n,label:r,max:i})=>B`
         <li>
           <label for=${`settings-${n}`}>${r}</label>
           <input id=${`settings-${n}`} class="inp sk num" type="number" inputmode="numeric" min="1" max=${i} step="1"
@@ -1432,15 +1435,15 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
         </li>`)}
     </ul>
   </section>
-`,CM=(e,t)=>B`
-  ${_M(e,t)}
-  ${yM(e,t)}
-`,wM=(e,t,n)=>B`
-  ${I(n.todoist,()=>CM(e,t),()=>V)}
-  ${bM(e,t)}
-  ${SM(e,t)}
+`,AM=(e,t)=>B`
+  ${wM(e,t)}
+  ${EM(e,t)}
+`,jM=(e,t,n)=>B`
+  ${I(n.todoist,()=>AM(e,t),()=>V)}
+  ${DM(e,t)}
+  ${kM(e,t)}
   <tt-alarm-settings></tt-alarm-settings>
-`,TM=e=>A(e.currentTarget,e=>e instanceof HTMLInputElement),EM=(e,t)=>x(t.trim().replace(/^@/,``).trim()).pipe(k(t=>t.length>0&&!e.includes(t)),D(t=>[...e,t])),DM=e=>A(e.currentTarget,e=>e instanceof HTMLFormElement),OM=e=>t=>{t.preventDefault(),D(DM(t),t=>{let n=[new FormData(t).get(`label`)].filter(e=>typeof e==`string`)[0]??``;D(EM(e.store.getState().catalog.activityLabels,n),t=>{e.store.dispatch({type:`catalog/activityLabelsSet`,at:e.now(),names:t})}),t.reset()})},kM=e=>()=>e(`/api/oauth/disconnect`,{method:`POST`,credentials:`same-origin`,headers:{"x-requested-with":`tt`}}).then(e=>e.ok,()=>!1),AM=(e,t)=>e.filter(e=>e!==t),jM={focusMs:{unitMs:6e4,max:240},shortBreakMs:{unitMs:6e4,max:240},longBreakMs:{unitMs:6e4,max:240},longBreakEvery:{unitMs:1,max:12}},MM=(e,t,n)=>x(Number(n.trim())).pipe(k(e=>n.trim()!==``&&Number.isInteger(e)&&e>=1&&e<=jM[t].max),D(n=>({...e,[t]:n*jM[t].unitMs}))),NM=(e,t)=>{let n=t.now,r=t.store.dispatch;return{toggleTodoist:e=>{D(TM(e),e=>{r({type:`sync/todoistToggled`,at:n(),enabled:e.checked})})},disconnect:()=>{kM(globalThis.fetch.bind(globalThis))().then(t=>{I(t,()=>{r({type:`sync/connectionChanged`,at:n(),connection:`disconnected`})},()=>{e.notice=`Disconnect failed, try again.`})})},retry:e=>{r({type:`sync/retried`,at:n(),uuid:e})},discard:e=>{r({type:`sync/discarded`,at:n(),uuid:e})},addLabel:OM(t),removeLabel:e=>{r({type:`catalog/activityLabelsSet`,at:n(),names:AM(t.store.getState().catalog.activityLabels,e)})},changeTimer:e=>i=>{D(TM(i),i=>{D(MM(t.store.getState().timer.settings,e,i.value),e=>{r({type:`timer/settingsChanged`,at:n(),settings:e}),Qb(t)})})}}},PM=cf(bf({notice:df(F)})),FM=e=>A(e,e=>e instanceof CustomEvent).pipe(O(e=>PM(e.detail)),O(e=>E(e.notice)),Zn),IM=e=>Array.from(e.renderRoot.querySelectorAll(`dialog`)),LM=e=>{let t=t=>{e.notice=FM(t),e.updateComplete.then(()=>{IM(e).forEach(e=>{L(!e.open,()=>{e.showModal()})})})};return{connect:()=>{globalThis.addEventListener(`tt:open-settings`,t)},disconnect:()=>{globalThis.removeEventListener(`tt:open-settings`,t)},close:()=>{IM(e).forEach(e=>{e.close()})}}},RM=z`
+`,MM=e=>A(e.currentTarget,e=>e instanceof HTMLInputElement),NM=(e,t)=>x(t.trim().replace(/^@/,``).trim()).pipe(k(t=>t.length>0&&!e.includes(t)),D(t=>[...e,t])),PM=e=>A(e.currentTarget,e=>e instanceof HTMLFormElement),FM=e=>t=>{t.preventDefault(),D(PM(t),t=>{let n=[new FormData(t).get(`label`)].filter(e=>typeof e==`string`)[0]??``;D(NM(e.store.getState().catalog.activityLabels,n),t=>{e.store.dispatch({type:`catalog/activityLabelsSet`,at:e.now(),names:t})}),t.reset()})},IM=e=>()=>e(`/api/oauth/disconnect`,{method:`POST`,credentials:`same-origin`,headers:{"x-requested-with":`tt`}}).then(e=>e.ok,()=>!1),LM=(e,t)=>e.filter(e=>e!==t),RM={focusMs:{unitMs:6e4,max:240},shortBreakMs:{unitMs:6e4,max:240},longBreakMs:{unitMs:6e4,max:240},longBreakEvery:{unitMs:1,max:12}},zM=(e,t,n)=>x(Number(n.trim())).pipe(k(e=>n.trim()!==``&&Number.isInteger(e)&&e>=1&&e<=RM[t].max),D(n=>({...e,[t]:n*RM[t].unitMs}))),BM=(e,t)=>{let n=t.now,r=t.store.dispatch;return{toggleTodoist:e=>{D(MM(e),e=>{r({type:`sync/todoistToggled`,at:n(),enabled:e.checked})})},disconnect:()=>{IM(globalThis.fetch.bind(globalThis))().then(t=>{I(t,()=>{r({type:`sync/connectionChanged`,at:n(),connection:`disconnected`})},()=>{e.notice=`Disconnect failed, try again.`})})},retry:e=>{r({type:`sync/retried`,at:n(),uuid:e})},discard:e=>{r({type:`sync/discarded`,at:n(),uuid:e})},addLabel:FM(t),removeLabel:e=>{r({type:`catalog/activityLabelsSet`,at:n(),names:LM(t.store.getState().catalog.activityLabels,e)})},changeTimer:e=>i=>{D(MM(i),i=>{D(zM(t.store.getState().timer.settings,e,i.value),e=>{r({type:`timer/settingsChanged`,at:n(),settings:e}),Qb(t)})})}}},VM=cf(bf({notice:df(F)})),HM=e=>A(e,e=>e instanceof CustomEvent).pipe(O(e=>VM(e.detail)),O(e=>E(e.notice)),Zn),UM=e=>Array.from(e.renderRoot.querySelectorAll(`dialog`)),WM=e=>{let t=t=>{e.notice=HM(t),e.updateComplete.then(()=>{UM(e).forEach(e=>{L(!e.open,()=>{e.showModal()})})})};return{connect:()=>{globalThis.addEventListener(`tt:open-settings`,t)},disconnect:()=>{globalThis.removeEventListener(`tt:open-settings`,t)},close:()=>{UM(e).forEach(e=>{e.close()})}}},GM=z`
   dialog { padding: 0; border: 0; background: transparent; color: inherit; width: min(560px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); }
   dialog::backdrop { background: color-mix(in srgb, var(--ink) 35%, transparent); }
   .sheet { box-sizing: border-box; padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: var(--shadow); }
@@ -1464,52 +1467,52 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
   a.btn { text-decoration: none; align-self: flex-start; }
   .btn { align-self: flex-start; }
   [hidden] { display: none; }
-`,zM=class extends H{static{this.properties={notice:{state:!0}}}static{this.styles=[U,RM]}constructor(){super(),this.link=W(this),this.ctl=LM(this),this.notice=void 0}connectedCallback(){super.connectedCallback(),this.ctl.connect()}disconnectedCallback(){super.disconnectedCallback(),this.ctl.disconnect()}render(){let e=G(this.link)((e,t)=>wM(pM(e),NM(this,t),t.integrations));return mM(this.notice,e,this.ctl.close)}};customElements.define(`tt-settings-dialog`,zM);var BM=(e,t)=>_S(e).pipe(er(e=>e.date===t&&e.closedAt===void 0)),VM=e=>()=>{e.store.dispatch({type:`timer/paused`,at:e.now()}),globalThis.dispatchEvent(new CustomEvent(`tt:end-day`))},$={button:`end-day`,review:`day-review`,title:`day-review-title`,total:`day-review-total`,row:e=>`review-row-${e}`,value:e=>`review-value-${e}`,rowLabel:e=>`review-label-${e}`,slider:e=>`review-slider-${e}`,typed:e=>`review-typed-${e}`,typedError:e=>`review-typed-error-${e}`,meta:e=>`review-meta-${e}`,chip:(e,t)=>`review-chip-${e}-${t}`,unfinished:e=>`review-unfinished-${e}`,tomorrow:e=>`review-tomorrow-${e}`,backlog:e=>`review-backlog-${e}`,allTomorrow:`review-all-tomorrow`,back:`review-back`,close:`review-close`},HM=class extends H{constructor(...e){super(...e),this.link=W(this)}static{this.styles=[U,z`
+`,KM=class extends H{static{this.properties={notice:{state:!0}}}static{this.styles=[U,GM]}constructor(){super(),this.link=W(this),this.ctl=WM(this),this.notice=void 0}connectedCallback(){super.connectedCallback(),this.ctl.connect()}disconnectedCallback(){super.disconnectedCallback(),this.ctl.disconnect()}render(){let e=G(this.link)((e,t)=>jM(bM(e),BM(this,t),t.integrations));return xM(this.notice,e,this.ctl.close)}};customElements.define(`tt-settings-dialog`,KM);var qM=(e,t)=>_S(e).pipe(er(e=>e.date===t&&e.closedAt===void 0)),JM=e=>()=>{e.store.dispatch({type:`timer/paused`,at:e.now()}),globalThis.dispatchEvent(new CustomEvent(`tt:end-day`))},$={button:`end-day`,review:`day-review`,title:`day-review-title`,total:`day-review-total`,row:e=>`review-row-${e}`,value:e=>`review-value-${e}`,rowLabel:e=>`review-label-${e}`,slider:e=>`review-slider-${e}`,typed:e=>`review-typed-${e}`,typedError:e=>`review-typed-error-${e}`,meta:e=>`review-meta-${e}`,chip:(e,t)=>`review-chip-${e}-${t}`,unfinished:e=>`review-unfinished-${e}`,tomorrow:e=>`review-tomorrow-${e}`,backlog:e=>`review-backlog-${e}`,allTomorrow:`review-all-tomorrow`,back:`review-back`,close:`review-close`},YM=class extends H{constructor(...e){super(...e),this.link=W(this)}static{this.styles=[U,z`
     :host { display: contents; }
     .btn { font-size: 16px; padding: 0 12px; white-space: nowrap; }
-  `]}render(){return G(this.link)((e,t)=>I(BM(e,t.today(e.now)),()=>B`<button type="button" class="btn sk2" data-testid=${$.button} @click=${VM(t)}>End day</button>`,()=>V))}updated(){this.toggleAttribute(`data-available`,Yn(T(this.renderRoot.querySelector(`button`))))}};customElements.define(`tt-end-day-button`,HM);var UM=e=>`${String(e)} ${I(e===1,()=>`focus`,()=>`focuses`)}`,WM=e=>({entry:t,title:n})=>{let r=e.labels[t.id]??t.label;return{id:t.id,title:n,label:r,labelText:kE(r),missing:r===``,asksLabel:t.label===``,...FT(t.accruedMs,OT(t),E(e.minutes[t.id]),E(e.typed[t.id]))}},GM=e=>t=>({...Jg(t,e.minutes[t.id]??OT(t)),label:e.labels[t.id]??t.label}),KM=(e,t,n)=>{let r=t=>r=>({taskId:r,title:IT(e.catalog,r),fromQueue:t,destination:I(n.backlog.includes(r),()=>`backlog`,()=>`tomorrow`)});return[...t.active.map(e=>r(!1)(e.taskId)),...t.queue.map(r(!0))]},qM=(e,t)=>{let n=E(e.pages.byId[t.pageId]),r=ME(e,t.pageId),i=r.entries.map(({entry:e})=>GM(t)(e));return{title:`End of day · ${n.pipe(D(e=>Qk(e.date)),w(()=>``))}`,totalText:AT(i.reduce((e,t)=>e+OT(t),0)),focusesText:UM(e.timer.focusesDone[t.pageId]??0),labels:jE(i).map(e=>({key:e.label,text:`${kE(e.label)} ${AT(e.minutes)}`,missing:e.label===``})),rows:r.entries.map(WM(t)),unfinished:n.pipe(D(n=>KM(e,n,t)),w(()=>[])),labelChoices:DT(e.catalog)}},JM=(e,t,n)=>B`
+  `]}render(){return G(this.link)((e,t)=>I(qM(e,t.today(e.now)),()=>B`<button type="button" class="btn sk2" data-testid=${$.button} @click=${JM(t)}>End day</button>`,()=>V))}updated(){this.toggleAttribute(`data-available`,Yn(T(this.renderRoot.querySelector(`button`))))}};customElements.define(`tt-end-day-button`,YM);var XM=e=>`${String(e)} ${I(e===1,()=>`focus`,()=>`focuses`)}`,ZM=e=>({entry:t,title:n})=>{let r=e.labels[t.id]??t.label;return{id:t.id,title:n,label:r,labelText:IE(r),missing:r===``,asksLabel:t.label===``,...FT(t.accruedMs,OT(t),E(e.minutes[t.id]),E(e.typed[t.id]))}},QM=e=>t=>({...Jg(t,e.minutes[t.id]??OT(t)),label:e.labels[t.id]??t.label}),$M=(e,t,n)=>{let r=t=>r=>({taskId:r,title:IT(e.catalog,r),fromQueue:t,destination:I(n.backlog.includes(r),()=>`backlog`,()=>`tomorrow`)});return[...t.active.map(e=>r(!1)(e.taskId)),...t.queue.map(r(!0))]},eN=(e,t)=>{let n=E(e.pages.byId[t.pageId]),r=zE(e,t.pageId),i=r.entries.map(({entry:e})=>QM(t)(e));return{title:`End of day · ${n.pipe(D(e=>aA(e.date)),w(()=>``))}`,totalText:AT(i.reduce((e,t)=>e+OT(t),0)),focusesText:XM(e.timer.focusesDone[t.pageId]??0),labels:RE(i).map(e=>({key:e.label,text:`${IE(e.label)} ${AT(e.minutes)}`,missing:e.label===``})),rows:r.entries.map(ZM(t)),unfinished:n.pipe(D(n=>$M(e,n,t)),w(()=>[])),labelChoices:DT(e.catalog)}},tN=(e,t,n)=>B`
   <p class="chips" role="group" aria-label="Activity label for ${e.title}">
     ${t.map(t=>B`<button type="button" class="chip-btn" aria-pressed=${String(e.label===t)}
       data-testid=${$.chip(e.id,t)} @click=${n.pick(e.id,t)}>@${t}</button>`)}
-  </p>`,YM=(e,t,n)=>B`
+  </p>`,nN=(e,t,n)=>B`
   <li class="e" data-testid=${$.row(e.id)} data-missing=${String(e.missing)}>
     <span class="top">
       <span class="name">${e.title}</span>
       <span class="lab" data-testid=${$.rowLabel(e.id)}>${e.labelText}</span>
       <span class="v" data-testid=${$.value(e.id)}>${e.valueText}</span>
     </span>
-    ${$T(e.title,e,{slide:n.slide(e.id),grab:n.grab,release:n.release,type:n.type(e.id)},{slider:$.slider(e.id),typed:$.typed(e.id),typedError:$.typedError(e.id),meta:$.meta(e.id),errorId:`err-${e.id}`})}
-    ${QT(e.asksLabel,()=>JM(e,t,n))}
-  </li>`,XM=[[`tomorrow`,`Tomorrow`,$.tomorrow],[`backlog`,`Backlog`,$.backlog]],ZM=(e,t)=>B`
+    ${oE(e.title,e,{slide:n.slide(e.id),grab:n.grab,release:n.release,type:n.type(e.id)},{slider:$.slider(e.id),typed:$.typed(e.id),typedError:$.typedError(e.id),meta:$.meta(e.id),errorId:`err-${e.id}`})}
+    ${aE(e.asksLabel,()=>tN(e,t,n))}
+  </li>`,rN=[[`tomorrow`,`Tomorrow`,$.tomorrow],[`backlog`,`Backlog`,$.backlog]],iN=(e,t)=>B`
   <li class="u" data-testid=${$.unfinished(e.taskId)}>
-    <span class="name">${e.title}${QT(e.fromQueue,()=>B` <span class="meta">· queue</span>`)}</span>
+    <span class="name">${e.title}${aE(e.fromQueue,()=>B` <span class="meta">· queue</span>`)}</span>
     <fieldset class="tg">
       <legend class="vh">${e.title} goes to</legend>
-      ${XM.map(([n,r,i])=>B`<label class="opt">
+      ${rN.map(([n,r,i])=>B`<label class="opt">
         <input type="radio" name="dest-${e.taskId}" value=${n} .checked=${ZT(e.destination===n)}
           data-testid=${i(e.taskId)} @change=${t.send(e.taskId,n)}>${r}</label>`)}
     </fieldset>
-  </li>`,QM=(e,t)=>B`
+  </li>`,aN=(e,t)=>B`
   <h3 class="sub" id="review-unfinished">Not finished
     <button type="button" class="link all" data-testid=${$.allTomorrow} @click=${t.allTomorrow}>all to tomorrow</button></h3>
-  <ul class="list" aria-labelledby="review-unfinished">${e.map(e=>ZM(e,t))}</ul>`,$M=(e,t)=>B`
+  <ul class="list" aria-labelledby="review-unfinished">${e.map(e=>iN(e,t))}</ul>`,oN=(e,t)=>B`
   <header class="head-part">
     <h2 id="review-title" class="head title" data-testid=${$.title}>${e.title}</h2>
     <p class="sum" data-testid=${$.total}><b class="tot">${e.totalText}</b> · ${e.focusesText}${e.labels.map(e=>B` · <span data-missing=${String(e.missing)}>${e.text}</span>`)}</p>
   </header>
   <section class="body" aria-labelledby="review-tasks">
     <h3 class="sub" id="review-tasks">Time per task <span class="meta">· drag or type (min or h:mm)</span></h3>
-    ${QT(e.rows.length===0,()=>B`<p class="meta">No time recorded on this page.</p>`)}
-    <ul class="list" aria-labelledby="review-tasks">${e.rows.map(n=>YM(n,e.labelChoices,t))}</ul>
-    ${QT(e.unfinished.length>0,()=>QM(e.unfinished,t))}
+    ${aE(e.rows.length===0,()=>B`<p class="meta">No time recorded on this page.</p>`)}
+    <ul class="list" aria-labelledby="review-tasks">${e.rows.map(n=>nN(n,e.labelChoices,t))}</ul>
+    ${aE(e.unfinished.length>0,()=>aN(e.unfinished,t))}
   </section>
   <footer class="foot">
     <button type="button" class="btn sk" data-testid=${$.back} @click=${t.back}>Back</button>
     <button type="button" class="btn sk2 primary" data-testid=${$.close} @click=${t.closeDay}>Close the day</button>
-  </footer>`,eN=(e,t)=>Object.fromEntries(Object.entries(e).filter(([e])=>e!==t)),tN=(e,t)=>n=>({...n,minutes:{...n.minutes,[e]:t},typed:eN(n.typed,e)}),nN=(e,t)=>n=>({...n,typed:{...n.typed,[e]:t},minutes:C(lT(t),{onNone:()=>n.minutes,onSome:t=>({...n.minutes,[e]:t})})}),rN=(e,t)=>n=>({...n,labels:{...n.labels,[e]:t}}),iN={tomorrow:(e,t)=>e.filter(e=>e!==t),backlog:(e,t)=>[...e.filter(e=>e!==t),t]},aN=(e,t)=>n=>({...n,backlog:iN[t](n.backlog,e)}),oN=e=>({...e,backlog:[]}),sN=(e,t,n,r)=>{let i=t=>E(e.log.entries[t]),a=Object.entries(t.labels).flatMap(([e,t])=>i(e).pipe(k(e=>e.label!==t),C({onNone:()=>[],onSome:e=>[{type:`log/labelPicked`,at:n,pageId:e.pageId,taskId:e.taskId,label:t,uuid:r()}]}))),o=Object.entries(t.minutes).filter(([e,t])=>i(e).pipe(er(e=>OT(e)!==t)));return[...a,{type:`pages/dayClosed`,at:n,pageId:t.pageId,minutes:Object.fromEntries(o),backlog:t.backlog}]},cN=(e,t)=>{let n=t=>{D(E(e.draft),n=>{e.draft=t(n)})},r=()=>{e.renderRoot.querySelector(`dialog`)?.close()},i=t=>uE(e.ctl.dragging,t);return{slide:e=>t=>{D(dE(t),t=>{n(tN(e,i(Number(t))))})},grab:()=>{e.ctl.dragging=!0},release:()=>{e.ctl.dragging=!1},type:e=>t=>{D(dE(t),t=>{n(nN(e,t))})},pick:(e,t)=>()=>{n(rN(e,t))},send:(e,t)=>()=>{n(aN(e,t))},allTomorrow:()=>{n(oN)},back:r,closeDay:()=>{D(E(e.draft),e=>{sN(t.store.getState(),e,t.now(),t.newId).forEach(e=>{t.store.dispatch(e)})}),r()}}},lN=e=>({pageId:e,minutes:{},typed:{},labels:{},backlog:[]}),uN=e=>{let t=()=>{D(O(e.link.services(),e=>E(e.store.getState().pages.currentPageId)),t=>{e.ctl.opener=vE(),e.draft=lN(t),e.updateComplete.then(()=>{D(T(e.renderRoot.querySelector(`dialog`)),e=>{L(!e.open,()=>{e.showModal()})})})})};return{connect:()=>{globalThis.addEventListener(`tt:end-day`,t)},disconnect:()=>{globalThis.removeEventListener(`tt:end-day`,t)}}},dN=e=>{e.draft=void 0;let t=e.ctl.opener;e.ctl.opener=b(),e.ctl.dragging=!1,bE(t)},fN=z`
+  </footer>`,sN=(e,t)=>Object.fromEntries(Object.entries(e).filter(([e])=>e!==t)),cN=(e,t)=>n=>({...n,minutes:{...n.minutes,[e]:t},typed:sN(n.typed,e)}),lN=(e,t)=>n=>({...n,typed:{...n.typed,[e]:t},minutes:C(lT(t),{onNone:()=>n.minutes,onSome:t=>({...n.minutes,[e]:t})})}),uN=(e,t)=>n=>({...n,labels:{...n.labels,[e]:t}}),dN={tomorrow:(e,t)=>e.filter(e=>e!==t),backlog:(e,t)=>[...e.filter(e=>e!==t),t]},fN=(e,t)=>n=>({...n,backlog:dN[t](n.backlog,e)}),pN=e=>({...e,backlog:[]}),mN=(e,t,n,r)=>{let i=t=>E(e.log.entries[t]),a=Object.entries(t.labels).flatMap(([e,t])=>i(e).pipe(k(e=>e.label!==t),C({onNone:()=>[],onSome:e=>[{type:`log/labelPicked`,at:n,pageId:e.pageId,taskId:e.taskId,label:t,uuid:r()}]}))),o=Object.entries(t.minutes).filter(([e,t])=>i(e).pipe(er(e=>OT(e)!==t)));return[...a,{type:`pages/dayClosed`,at:n,pageId:t.pageId,minutes:Object.fromEntries(o),backlog:t.backlog}]},hN=(e,t)=>{let n=t=>{D(E(e.draft),n=>{e.draft=t(n)})},r=()=>{e.renderRoot.querySelector(`dialog`)?.close()},i=t=>_E(e.ctl.dragging,t);return{slide:e=>t=>{D(vE(t),t=>{n(cN(e,i(Number(t))))})},grab:()=>{e.ctl.dragging=!0},release:()=>{e.ctl.dragging=!1},type:e=>t=>{D(vE(t),t=>{n(lN(e,t))})},pick:(e,t)=>()=>{n(uN(e,t))},send:(e,t)=>()=>{n(fN(e,t))},allTomorrow:()=>{n(pN)},back:r,closeDay:()=>{D(E(e.draft),e=>{mN(t.store.getState(),e,t.now(),t.newId).forEach(e=>{t.store.dispatch(e)})}),r()}}},gN=e=>({pageId:e,minutes:{},typed:{},labels:{},backlog:[]}),_N=e=>{let t=()=>{D(O(e.link.services(),e=>E(e.store.getState().pages.currentPageId)),t=>{e.ctl.opener=TE(),e.draft=gN(t),e.updateComplete.then(()=>{D(T(e.renderRoot.querySelector(`dialog`)),e=>{L(!e.open,()=>{e.showModal()})})})})};return{connect:()=>{globalThis.addEventListener(`tt:end-day`,t)},disconnect:()=>{globalThis.removeEventListener(`tt:end-day`,t)}}},vN=e=>{e.draft=void 0;let t=e.ctl.opener;e.ctl.opener=b(),e.ctl.dragging=!1,DE(t)},yN=z`
   dialog { inline-size: min(560px, 100vw); block-size: 100dvh; margin-block: 0; }
   .title { font-size: 34px; }
-  .sum { font-size: 18px; }
+  .sum { font-size: 18px; overflow-wrap: anywhere; }
   .tot { font-family: var(--font-head); font-size: 28px; }
   [data-missing='true'] > .lab, .sum [data-missing='true'] { color: var(--warn); }
   .sub { font-size: 18px; font-weight: 400; display: flex; align-items: baseline; gap: 6px; }
@@ -1517,8 +1520,8 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
   .list { list-style: none; margin: 0; padding: 0; }
   .e { display: flex; flex-direction: column; gap: 2px; padding: 6px 4px; border-block-end: 1.5px dashed var(--rule); }
   .e[data-missing='true'] { background: var(--warn-bg); }
-  .top { display: flex; align-items: baseline; gap: 6px; font-size: 17px; }
-  .name { flex-grow: 1; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .top { display: flex; align-items: baseline; gap: 6px; font-size: 17px; min-inline-size: 0; }
+  .name { flex: 1 1 0; min-inline-size: 0; overflow-wrap: anywhere; }
   .lab { font-size: 13px; padding: 0 7px; border: 1.5px solid var(--ink); border-radius: var(--r-chip); }
   [data-missing='true'] > .top > .lab { border-style: dashed; border-color: var(--warn); color: var(--warn); }
   .u { display: flex; align-items: center; gap: 6px; min-block-size: 48px; border-block-end: 1.5px dashed var(--rule); font-size: 17px; }
@@ -1533,5 +1536,5 @@ var e=(e,t)=>{switch(t.length){case 0:return e;case 1:return t[0](e);case 2:retu
     .title { font-size: 24px; }
     .sum { font-size: 15px; } .tot { font-size: 20px; }
   }
-`,pN=class extends H{static{this.properties={draft:{state:!0}}}static{this.styles=[U,iT,SE,fN]}constructor(){super(),this.link=W(this),this.ctl={opener:b(),dragging:!1},this.events=uN(this),this.draft=void 0}connectedCallback(){super.connectedCallback(),this.events.connect()}disconnectedCallback(){super.disconnectedCallback(),this.events.disconnect()}render(){let e=G(this.link)((e,t)=>C(E(this.draft),{onNone:()=>V,onSome:n=>$M(qM(e,n),cN(this,t))}));return B`<dialog aria-labelledby="review-title" data-testid=${$.review} @close=${()=>{dN(this)}}>
-      <article class="sheet">${e}</article></dialog>`}};customElements.define(`tt-day-review`,pN),(async()=>{let e=fp(await lp()),t=await Ls(e.load),n=Xn(pp(),()=>t),r=Rx({ASSETS_PREFIX:void 0,BASE_URL:`/focus-tracker/`,DEV:!1,MODE:`production`,PROD:!0,SITE:void 0,SSR:!1}),i=w(D(n,rS),()=>f_(Date.now())),a=mp(l_)(Bx(r)(i)),o=g_(a,r);[__,v_(e),...Lx].forEach(e=>e(o)),Array.from(document.getElementsByTagName(`tt-app`)).filter(e=>e instanceof ES).forEach(e=>{e.services=o}),a.dispatch({type:`timer/ticked`,at:o.now()})})();
+`,bN=class extends H{static{this.properties={draft:{state:!0}}}static{this.styles=[U,iT,kE,yN]}constructor(){super(),this.link=W(this),this.ctl={opener:b(),dragging:!1},this.events=_N(this),this.draft=void 0}connectedCallback(){super.connectedCallback(),this.events.connect()}disconnectedCallback(){super.disconnectedCallback(),this.events.disconnect()}render(){let e=G(this.link)((e,t)=>C(E(this.draft),{onNone:()=>V,onSome:n=>oN(eN(e,n),hN(this,t))}));return B`<dialog aria-labelledby="review-title" data-testid=${$.review} @close=${()=>{vN(this)}}>
+      <article class="sheet">${e}</article></dialog>`}};customElements.define(`tt-day-review`,bN),(async()=>{let e=fp(await lp()),t=await Ls(e.load),n=Xn(pp(),()=>t),r=Rx({ASSETS_PREFIX:void 0,BASE_URL:`/focus-tracker/`,DEV:!1,MODE:`production`,PROD:!0,SITE:void 0,SSR:!1}),i=w(D(n,rS),()=>f_(Date.now())),a=mp(l_)(Bx(r)(i)),o=g_(a,r);[__,v_(e),...Lx].forEach(e=>e(o)),Array.from(document.getElementsByTagName(`tt-app`)).filter(e=>e instanceof ES).forEach(e=>{e.services=o}),a.dispatch({type:`timer/ticked`,at:o.now()})})();
